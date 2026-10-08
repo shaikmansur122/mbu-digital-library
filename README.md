@@ -36,7 +36,7 @@ admin dashboard.
 
 - [x] Phase 1: project setup, MySQL, login for student / faculty / admin, admin account management
 - [x] Phase 2: main layout (top nav, side menu, ID card, faculty card, profile with photo and resume upload)
-- [ ] Phase 3: modules (subjects, PDFs, YouTube links)
+- [x] Phase 3: modules (semester, subjects, modules, PDFs and YouTube links posted by the subject's faculty)
 - [ ] Phase 4: lab experiments with in-browser code editor
 - [ ] Phase 5: assignments
 - [ ] Phase 6: attendance

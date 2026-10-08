@@ -1,5 +1,6 @@
 package edu.mbu.library.web;
 
+import edu.mbu.library.modules.SubjectRepository;
 import edu.mbu.library.user.Role;
 import edu.mbu.library.user.User;
 import edu.mbu.library.user.UserRepository;
@@ -21,10 +22,12 @@ public class AdminController {
 
     private final UserRepository users;
     private final PasswordEncoder encoder;
+    private final SubjectRepository subjects;
 
-    public AdminController(UserRepository users, PasswordEncoder encoder) {
+    public AdminController(UserRepository users, PasswordEncoder encoder, SubjectRepository subjects) {
         this.users = users;
         this.encoder = encoder;
+        this.subjects = subjects;
     }
 
     @GetMapping("/admin/dashboard")
@@ -88,6 +91,9 @@ public class AdminController {
             redirect.addFlashAttribute("error", "Account not found");
         } else if (target.getUsername().equals(auth.getName())) {
             redirect.addFlashAttribute("error", "You cannot delete your own account");
+        } else if (subjects.countByFaculty(target) > 0) {
+            redirect.addFlashAttribute("error", "'" + target.getUsername()
+                    + "' still teaches subjects. Delete those subjects first.");
         } else {
             users.clearMentor(target);
             users.delete(target);

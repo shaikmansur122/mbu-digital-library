@@ -3,6 +3,7 @@ package edu.mbu.library.security;
 import edu.mbu.library.user.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
@@ -21,8 +22,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/error", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                // Only faculty may change module content (the controller also checks they own the subject).
+                .requestMatchers(HttpMethod.POST, "/modules/**").hasRole("FACULTY")
                 // Students and faculty share the same interface; what they can do inside is decided per page.
-                .requestMatchers("/home", "/modules", "/labs", "/tools", "/resources", "/results", "/codes",
+                .requestMatchers("/home", "/modules/**", "/labs", "/tools", "/resources", "/results", "/codes",
                         "/editor", "/attendance", "/marks", "/assignments", "/profile", "/people/**", "/files/**")
                     .hasAnyRole("STUDENT", "FACULTY")
                 .requestMatchers("/").authenticated()

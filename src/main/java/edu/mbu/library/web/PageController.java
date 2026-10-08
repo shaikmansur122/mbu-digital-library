@@ -14,8 +14,6 @@ public class PageController {
     private record Section(String key, String title, String phase, String description) {}
 
     private static final Map<String, Section> SECTIONS = Map.of(
-            "/modules", new Section("modules", "Modules", "Phase 3",
-                    "Semester-wise subjects with PDFs and YouTube links posted by faculty."),
             "/labs", new Section("labs", "Lab Experiments", "Phase 4",
                     "Lab experiments assigned by faculty, solved and submitted in the built-in code editor."),
             "/tools", new Section("tools", "Tools", "Phase 8",
@@ -40,7 +38,7 @@ public class PageController {
         return "home";
     }
 
-    @GetMapping({"/modules", "/labs", "/tools", "/resources", "/results", "/codes", "/editor",
+    @GetMapping({"/labs", "/tools", "/resources", "/results", "/codes", "/editor",
             "/attendance", "/marks", "/assignments"})
     public String section(HttpServletRequest request, Model model) {
         Section s = SECTIONS.get(request.getServletPath());

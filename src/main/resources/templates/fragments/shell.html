@@ -57,6 +57,9 @@
                 <th:block th:if="${me.role.name() == 'FACULTY'}">
                     <dt>Role</dt><dd>Faculty</dd>
                 </th:block>
+                <th:block th:if="${mySubjects != null}">
+                    <dt>Subject</dt><dd th:text="${mySubjects}">-</dd>
+                </th:block>
                 <th:block th:if="${me.semester != null}">
                     <dt>Semester</dt><dd th:text="${me.semester}">-</dd>
                 </th:block>

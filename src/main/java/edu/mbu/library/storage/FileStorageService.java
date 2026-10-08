@@ -23,6 +23,7 @@ public class FileStorageService {
 
     public static final String PHOTOS = "photos";
     public static final String RESUMES = "resumes";
+    public static final String MATERIALS = "materials";
 
     private final Path root;
 
@@ -43,6 +44,15 @@ public class FileStorageService {
 
     /** Saves a resume (PDF, verified by its header). Returns the stored file name. */
     public String saveResume(MultipartFile file) throws IOException {
+        return savePdf(RESUMES, file);
+    }
+
+    /** Saves a module PDF uploaded by faculty. Returns the stored file name. */
+    public String saveMaterial(MultipartFile file) throws IOException {
+        return savePdf(MATERIALS, file);
+    }
+
+    private String savePdf(String kind, MultipartFile file) throws IOException {
         String ext = extensionOf(file, "pdf");
         try (InputStream in = file.getInputStream()) {
             byte[] head = in.readNBytes(5);
@@ -50,12 +60,12 @@ public class FileStorageService {
                 throw new IllegalArgumentException("That file is not a valid PDF.");
             }
         }
-        return store(RESUMES, file, ext);
+        return store(kind, file, ext);
     }
 
     /** Returns the stored file, or null if the kind is unknown, the name is unsafe, or the file is missing. */
     public Resource load(String kind, String name) {
-        if (!PHOTOS.equals(kind) && !RESUMES.equals(kind)) {
+        if (!PHOTOS.equals(kind) && !RESUMES.equals(kind) && !MATERIALS.equals(kind)) {
             return null;
         }
         Path dir = root.resolve(kind).normalize();

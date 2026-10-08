@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell(${subject.name}, 'modules', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <p class="crumbs">
+        <a th:href="@{/modules(sem=${subject.semester})}">&larr; Modules</a>
+        <span class="muted">/ Semester <span th:text="${subject.semester}">1</span></span>
+    </p>
+
+    <div class="card subject-head">
+        <div>
+            <span class="code" th:text="${subject.code}">CODE</span>
+            <h2 th:text="${subject.name}">Subject</h2>
+            <p class="muted">Faculty:
+                <a th:href="@{/people/{id}(id=${subject.faculty.id})}" th:text="${subject.faculty.fullName}">Faculty</a>
+            </p>
+        </div>
+        <form th:if="${canManage}" th:action="@{/modules/subjects/{id}/delete(id=${subject.id})}" method="post"
+              onsubmit="return confirm('Delete this subject with all its modules, PDFs and links?');">
+            <button type="submit" class="btn secondary small">Delete subject</button>
+        </form>
+    </div>
+
+    <p class="muted" th:if="${#lists.isEmpty(moduleList)}">
+        No modules yet.<span th:if="${canManage}"> Add the first one below.</span>
+    </p>
+
+    <section class="card module" th:each="m : ${moduleList}">
+        <div class="module-head">
+            <h3><span class="muted">Module <span th:text="${m.position}">1</span>:</span> <span th:text="${m.title}">Title</span></h3>
+            <form th:if="${canManage}" th:action="@{/modules/modules/{id}/delete(id=${m.id})}" method="post"
+                  onsubmit="return confirm('Delete this module and everything in it?');">
+                <button type="submit" class="btn secondary small">Delete module</button>
+            </form>
+        </div>
+
+        <p class="muted small" th:if="${materialsByModule.get(m.id) == null}">Nothing uploaded in this module yet.</p>
+
+        <ul class="materials" th:if="${materialsByModule.get(m.id) != null}">
+            <li th:each="mat : ${materialsByModule.get(m.id)}">
+                <div class="mat-row">
+                    <!-- PDF -->
+                    <a th:if="${mat.type.name() == 'PDF'}" th:href="@{/files/materials/{f}(f=${mat.fileName})}"
+                       target="_blank" class="mat-link"><span class="ico">&#128196;</span><span th:text="${mat.title}">PDF</span></a>
+                    <!-- YouTube -->
+                    <a th:if="${mat.type.name() == 'VIDEO'}" th:href="${mat.url}" target="_blank" rel="noopener noreferrer"
+                       class="mat-link"><span class="ico">&#9654;&#65039;</span><span th:text="${mat.title}">Video</span></a>
+                    <span class="badge light" th:text="${mat.type.name() == 'PDF'} ? 'PDF' : 'YouTube'">PDF</span>
+                    <form th:if="${canManage}" th:action="@{/modules/materials/{id}/delete(id=${mat.id})}" method="post"
+                          onsubmit="return confirm('Remove this item?');">
+                        <button type="submit" class="link-btn">Remove</button>
+                    </form>
+                </div>
+                <details class="embed" th:if="${mat.type.name() == 'VIDEO' and mat.youtubeId != null}">
+                    <summary class="small">Watch here</summary>
+                    <div class="video-frame">
+                        <iframe loading="lazy" allowfullscreen
+                                th:src="'https://www.youtube-nocookie.com/embed/' + ${mat.youtubeId}"
+                                th:title="${mat.title}"></iframe>
+                    </div>
+                </details>
+            </li>
+        </ul>
+
+        <!-- Faculty: add a PDF or a YouTube link to this module -->
+        <details class="add-material" th:if="${canManage}">
+            <summary class="summary-btn small">+ Add PDF or YouTube link</summary>
+            <form th:action="@{/modules/modules/{id}/materials(id=${m.id})}" method="post"
+                  enctype="multipart/form-data" class="stack material-form">
+                <div class="grid">
+                    <div class="field">
+                        <label>Type</label>
+                        <select name="type" class="type-select">
+                            <option value="PDF">PDF file</option>
+                            <option value="VIDEO">YouTube link</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Title</label>
+                        <input name="title" type="text" maxlength="150" required placeholder="e.g. Lecture notes">
+                    </div>
+                    <div class="field for-pdf">
+                        <label>PDF file</label>
+                        <input name="file" type="file" accept=".pdf,application/pdf">
+                    </div>
+                    <div class="field for-video" hidden>
+                        <label>YouTube link</label>
+                        <input name="url" type="text" maxlength="500" placeholder="https://www.youtube.com/watch?v=...">
+                    </div>
+                </div>
+                <button type="submit" class="btn small">Add</button>
+            </form>
+        </details>
+    </section>
+
+    <!-- Faculty: add a module -->
+    <div class="card" th:if="${canManage}">
+        <details th:attr="open=${#lists.isEmpty(moduleList)} ? 'open'">
+            <summary class="summary-btn">+ Add a module</summary>
+            <form th:action="@{/modules/subjects/{id}/modules(id=${subject.id})}" method="post" class="stack">
+                <div class="field">
+                    <label for="mtitle">Module title</label>
+                    <input id="mtitle" name="title" type="text" maxlength="150" required
+                           placeholder="e.g. Introduction to Machine Learning">
+                </div>
+                <button type="submit" class="btn">Add module</button>
+            </form>
+        </details>
+    </div>
+
+    <script th:src="@{/js/modules.js}"></script>
+</main>
+</body>
+</html>

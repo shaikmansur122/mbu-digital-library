@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Modules', 'modules', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card">
+        <h2>Modules</h2>
+        <div class="semtabs" role="tablist" aria-label="Semester">
+            <a th:each="s : ${semesters}" th:href="@{/modules(sem=${s})}"
+               th:classappend="${s == semester} ? 'active'" th:text="'Sem ' + ${s}">Sem 1</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Semester <span th:text="${semester}">1</span> subjects</h2>
+
+        <p class="muted" th:if="${#lists.isEmpty(subjectList)}">
+            No subjects have been added for this semester yet.
+            <span th:if="${isFaculty}">Use <em>Add a subject</em> below to create one.</span>
+        </p>
+
+        <div class="subjects">
+            <a class="subject-card" th:each="s : ${subjectList}" th:href="@{/modules/subjects/{id}(id=${s.id})}">
+                <span class="code" th:text="${s.code}">CODE</span>
+                <strong th:text="${s.name}">Subject</strong>
+                <small class="muted" th:text="${s.faculty.fullName}">Faculty</small>
+                <small th:text="${moduleCounts.get(s.id)} + ' module(s)'">0 modules</small>
+            </a>
+        </div>
+    </div>
+
+    <div class="card" th:if="${isFaculty}">
+        <details th:attr="open=${error != null} ? 'open'">
+            <summary class="summary-btn">+ Add a subject</summary>
+            <form th:action="@{/modules/subjects}" method="post" class="stack">
+                <div class="grid">
+                    <div class="field">
+                        <label for="code">Subject code</label>
+                        <input id="code" name="code" type="text" maxlength="20" required placeholder="e.g. DS301">
+                    </div>
+                    <div class="field">
+                        <label for="name">Subject name</label>
+                        <input id="name" name="name" type="text" maxlength="120" required placeholder="e.g. Machine Learning">
+                    </div>
+                    <div class="field">
+                        <label for="semester">Semester</label>
+                        <select id="semester" name="semester" required>
+                            <option th:each="s : ${semesters}" th:value="${s}" th:text="${s}"
+                                    th:selected="${s == semester}">1</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn">Create subject</button>
+                <p class="muted small">You become the faculty for this subject and can add modules, PDFs and YouTube links to it.</p>
+            </form>
+        </details>
+    </div>
+</main>
+</body>
+</html>
