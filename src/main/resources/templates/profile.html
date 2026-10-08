@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('My Profile', 'profile', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card">
+        <h2>My profile</h2>
+        <form th:action="@{/profile}" method="post" enctype="multipart/form-data">
+            <div class="field">
+                <label for="photo">ID card photo (JPG or PNG)</label>
+                <input id="photo" name="photo" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+            </div>
+            <div class="field">
+                <label for="githubUrl">GitHub link</label>
+                <input id="githubUrl" name="githubUrl" type="text" maxlength="255"
+                       placeholder="https://github.com/your-username" th:value="${me.githubUrl}">
+            </div>
+            <div class="field">
+                <label for="linkedinUrl">LinkedIn link</label>
+                <input id="linkedinUrl" name="linkedinUrl" type="text" maxlength="255"
+                       placeholder="https://www.linkedin.com/in/your-name" th:value="${me.linkedinUrl}">
+            </div>
+            <div class="field">
+                <label for="resume">Resume (PDF)</label>
+                <input id="resume" name="resume" type="file" accept=".pdf,application/pdf">
+                <p class="muted small" th:if="${me.resumeFile != null}">
+                    Current resume: <a th:href="@{/files/resumes/{f}(f=${me.resumeFile})}" target="_blank">view</a>
+                    (uploading a new one replaces it)</p>
+            </div>
+            <div class="field">
+                <label for="resumeUrl">Or a resume link</label>
+                <input id="resumeUrl" name="resumeUrl" type="text" maxlength="255"
+                       placeholder="https://..." th:value="${me.resumeUrl}">
+            </div>
+            <button type="submit" class="btn">Save</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

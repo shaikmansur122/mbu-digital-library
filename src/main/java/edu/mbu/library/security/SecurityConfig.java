@@ -19,11 +19,14 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/login", "/error", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/faculty/**").hasRole("FACULTY")
-                .requestMatchers("/student/**").hasRole("STUDENT")
-                .anyRequest().authenticated())
+                // Students and faculty share the same interface; what they can do inside is decided per page.
+                .requestMatchers("/home", "/modules", "/labs", "/tools", "/resources", "/results", "/codes",
+                        "/editor", "/attendance", "/marks", "/assignments", "/profile", "/people/**", "/files/**")
+                    .hasAnyRole("STUDENT", "FACULTY")
+                .requestMatchers("/").authenticated()
+                .anyRequest().denyAll())
             .formLogin(form -> form
                 .loginPage("/login")
                 .successHandler(roleBasedSuccessHandler())

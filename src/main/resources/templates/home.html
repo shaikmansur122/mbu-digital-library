@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Home', 'home', ~{::main})}">
+<body>
+<main class="main">
+    <div class="card">
+        <h2>Welcome, <span th:text="${me.fullName}">Name</span></h2>
+        <p class="muted" th:if="${me.role.name() == 'STUDENT'}">
+            Everything for your course is here: modules, lab experiments, assignments, attendance and marks.
+        </p>
+        <p class="muted" th:if="${me.role.name() == 'FACULTY'}">
+            Upload modules and resources, assign lab experiments and assignments, and track your students.
+        </p>
+    </div>
+
+    <div class="tiles">
+        <a class="tile" th:href="@{/modules}"><span class="ico">&#128218;</span><strong>Modules</strong>
+            <small>Subjects, PDFs and videos</small></a>
+        <a class="tile" th:href="@{/labs}"><span class="ico">&#129514;</span><strong>Lab Experiments</strong>
+            <small>Code and submit</small></a>
+        <a class="tile" th:href="@{/assignments}"><span class="ico">&#128194;</span><strong>Assignments</strong>
+            <small>Posted by faculty</small></a>
+        <a class="tile" th:href="@{/attendance}"><span class="ico">&#128197;</span><strong>Attendance</strong>
+            <small>Subject-wise</small></a>
+        <a class="tile" th:href="@{/marks}"><span class="ico">&#128221;</span><strong>Marks</strong>
+            <small>Internal and exam</small></a>
+        <a class="tile" th:href="@{/editor}"><span class="ico">&#128187;</span><strong>Editor</strong>
+            <small>Practice coding</small></a>
+    </div>
+</main>
+</body>
+</html>

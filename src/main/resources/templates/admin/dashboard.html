@@ -55,6 +55,13 @@
                     <label for="semester">Semester</label>
                     <input id="semester" type="number" min="1" max="8" th:field="*{semester}">
                 </div>
+                <div class="field">
+                    <label for="mentorId">Faculty card (students)</label>
+                    <select id="mentorId" th:field="*{mentorId}">
+                        <option value="">-- none --</option>
+                        <option th:each="f : ${facultyList}" th:value="${f.id}" th:text="${f.fullName}"></option>
+                    </select>
+                </div>
             </div>
             <button type="submit" class="btn">Create account</button>
         </form>

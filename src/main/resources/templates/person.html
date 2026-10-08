@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell(${person.fullName}, 'people', ~{::main})}">
+<body>
+<main class="main">
+    <div class="card person">
+        <div class="person-head">
+            <img th:if="${person.photoFile != null}" class="avatar"
+                 th:src="@{/files/photos/{f}(f=${person.photoFile})}" alt="Photo">
+            <div th:unless="${person.photoFile != null}" class="avatar placeholder" th:text="${person.initial}">A</div>
+            <div>
+                <h2 th:text="${person.fullName}">Faculty</h2>
+                <p class="muted" th:text="${person.department}">Department</p>
+                <span class="badge">Faculty</span>
+            </div>
+        </div>
+
+        <dl class="details">
+            <dt>Email</dt><dd th:text="${person.email != null} ? ${person.email} : '-'">-</dd>
+            <dt>GitHub</dt>
+            <dd><a th:if="${person.githubUrl != null}" th:href="${person.githubUrl}" th:text="${person.githubUrl}"
+                   target="_blank" rel="noopener noreferrer"></a><span th:unless="${person.githubUrl != null}">-</span></dd>
+            <dt>LinkedIn</dt>
+            <dd><a th:if="${person.linkedinUrl != null}" th:href="${person.linkedinUrl}" th:text="${person.linkedinUrl}"
+                   target="_blank" rel="noopener noreferrer"></a><span th:unless="${person.linkedinUrl != null}">-</span></dd>
+            <dt>Resume</dt>
+            <dd>
+                <a th:if="${person.resumeFile != null}" th:href="@{/files/resumes/{f}(f=${person.resumeFile})}"
+                   target="_blank">View resume (PDF)</a>
+                <a th:if="${person.resumeFile == null and person.resumeUrl != null}" th:href="${person.resumeUrl}"
+                   target="_blank" rel="noopener noreferrer">View resume</a>
+                <span th:if="${person.resumeFile == null and person.resumeUrl == null}">Not uploaded yet</span>
+            </dd>
+        </dl>
+    </div>
+</main>
+</body>
+</html>

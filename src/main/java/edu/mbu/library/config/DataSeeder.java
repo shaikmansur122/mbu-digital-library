@@ -30,6 +30,15 @@ public class DataSeeder implements CommandLineRunner {
                 "Data Science", null, null);
         seed("student1", "Student@123", Role.STUDENT, "Sample Student", "23MBU0001",
                 "Data Science", "A", 3);
+
+        // Give the sample student a faculty card (also fixes accounts created before this field existed).
+        users.findByUsername("student1").ifPresent(student ->
+                users.findByUsername("faculty1").ifPresent(faculty -> {
+                    if (student.getMentor() == null) {
+                        student.setMentor(faculty);
+                        users.save(student);
+                    }
+                }));
     }
 
     private void seed(String username, String rawPassword, Role role, String fullName,

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,7 @@ public class AdminController {
             model.addAttribute("form", new CreateUserForm());
         }
         model.addAttribute("roles", Role.values());
+        model.addAttribute("facultyList", users.findAllByRoleOrderByFullNameAsc(Role.FACULTY));
         return "admin/dashboard";
     }
 
@@ -67,6 +69,11 @@ public class AdminController {
         u.setDepartment(blankToNull(form.getDepartment()));
         u.setSection(blankToNull(form.getSection()));
         u.setSemester(form.getSemester());
+        if (form.getRole() == Role.STUDENT && form.getMentorId() != null) {
+            users.findById(form.getMentorId())
+                    .filter(m -> m.getRole() == Role.FACULTY)
+                    .ifPresent(u::setMentor);
+        }
         users.save(u);
 
         redirect.addFlashAttribute("message", "Created " + form.getRole() + " account '" + u.getUsername() + "'");
@@ -74,6 +81,7 @@ public class AdminController {
     }
 
     @PostMapping("/admin/users/{id}/delete")
+    @Transactional
     public String delete(@PathVariable Long id, Authentication auth, RedirectAttributes redirect) {
         User target = users.findById(id).orElse(null);
         if (target == null) {
@@ -81,6 +89,7 @@ public class AdminController {
         } else if (target.getUsername().equals(auth.getName())) {
             redirect.addFlashAttribute("error", "You cannot delete your own account");
         } else {
+            users.clearMentor(target);
             users.delete(target);
             redirect.addFlashAttribute("message", "Deleted account '" + target.getUsername() + "'");
         }

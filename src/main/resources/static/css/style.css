@@ -106,3 +106,142 @@ th { background: #fafafb; font-size: .8rem; text-transform: uppercase; letter-sp
 @media (max-width: 640px) {
   .topbar { flex-direction: column; align-items: flex-start; }
 }
+
+/* ================= Phase 2: shared shell ================= */
+.muted { color: var(--muted); }
+.small { font-size: .8rem; }
+
+/* Title bar navigation */
+.topnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 24px;
+  background: var(--mbu-red);
+}
+.topnav a {
+  color: #fff;
+  text-decoration: none;
+  padding: 11px 18px;
+  font-size: .92rem;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+}
+.topnav a:hover { background: var(--mbu-red-dark); }
+.topnav a.active { border-bottom-color: var(--mbu-gold); background: var(--mbu-red-dark); }
+
+/* Three columns: side menu | content | ID card */
+.shell {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr) 270px;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 0 20px;
+  align-items: start;
+}
+
+.sidebar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px;
+  position: sticky;
+  top: 12px;
+}
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: .93rem;
+}
+.sidebar a:hover { background: #f3f4f7; }
+.sidebar a.active { background: #fbeaea; color: var(--mbu-red); font-weight: 600; }
+.sidebar hr { border: 0; border-top: 1px solid var(--border); margin: 6px 4px; }
+.ico { width: 22px; text-align: center; }
+
+.main { min-width: 0; }
+.main > .card:first-child { margin-top: 0; }
+
+/* Right-hand ID card and faculty card */
+.rightbar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 12px; }
+.idcard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--mbu-gold);
+  border-radius: 10px;
+  padding: 14px 18px 16px;
+}
+.idcard-head {
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.avatar-wrap { display: flex; justify-content: center; margin-bottom: 12px; }
+.avatar {
+  width: 110px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: #eef0f4;
+}
+.avatar.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: var(--mbu-red);
+}
+.idcard dl, .details { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: .88rem; }
+.idcard dt, .details dt { color: var(--muted); }
+.idcard dd, .details dd { margin: 0; font-weight: 600; word-break: break-word; }
+.links { list-style: none; display: flex; gap: 14px; padding: 0; margin: 10px 0 0; font-size: .88rem; }
+a { color: var(--mbu-red); }
+.card-link { display: inline-block; margin-top: 12px; font-size: .85rem; }
+
+/* Home tiles */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  text-decoration: none;
+}
+.tile:hover { border-color: var(--mbu-red); box-shadow: 0 2px 8px rgba(0, 0, 0, .06); }
+.tile .ico { font-size: 1.6rem; width: auto; text-align: left; }
+.tile small { color: var(--muted); }
+
+/* Faculty "view more" page */
+.person-head { display: flex; align-items: center; gap: 20px; margin-bottom: 18px; }
+.person-head h2 { margin: 0 0 4px; }
+.person-head p { margin: 0 0 6px; }
+.person-head .avatar { width: 96px; height: 112px; }
+.details { grid-template-columns: 110px 1fr; }
+
+/* Tablet and phone: stack the columns */
+@media (max-width: 1100px) {
+  .shell { grid-template-columns: 190px minmax(0, 1fr); }
+  .rightbar { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; position: static; }
+  .rightbar .idcard { flex: 1 1 260px; }
+}
+@media (max-width: 760px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { position: static; display: flex; flex-wrap: wrap; }
+  .sidebar hr { display: none; }
+  .topnav { padding: 0 8px; }
+  .topnav a { padding: 10px 11px; font-size: .85rem; }
+}

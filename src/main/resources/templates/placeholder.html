@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell(${title}, ${active}, ~{::main})}">
+<body>
+<main class="main">
+    <div class="card">
+        <h2 th:text="${title}">Section</h2>
+        <p th:text="${description}">Description</p>
+        <p><span class="badge" th:text="${phase}">Phase</span> <span class="muted">This section is built in a later phase.</span></p>
+    </div>
+</main>
+</body>
+</html>

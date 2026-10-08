@@ -39,6 +39,12 @@ public class CreateUserForm {
 
     private Integer semester;
 
+    /** Faculty shown on a student's faculty card. */
+    private Long mentorId;
+
+    public Long getMentorId() { return mentorId; }
+    public void setMentorId(Long mentorId) { this.mentorId = mentorId; }
+
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 

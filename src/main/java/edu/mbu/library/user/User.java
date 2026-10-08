@@ -51,6 +51,26 @@ public class User {
     @Column(length = 255)
     private String photoFile;
 
+    /** Uploaded resume PDF (file name inside uploads/resumes). */
+    @Column(length = 255)
+    private String resumeFile;
+
+    /** Faculty member shown on a student's faculty card. */
+    @ManyToOne
+    @JoinColumn(name = "mentor_id")
+    private User mentor;
+
+    public String getResumeFile() { return resumeFile; }
+    public void setResumeFile(String resumeFile) { this.resumeFile = resumeFile; }
+
+    public User getMentor() { return mentor; }
+    public void setMentor(User mentor) { this.mentor = mentor; }
+
+    /** First letter of the name, used when there is no photo. */
+    public String getInitial() {
+        return (fullName == null || fullName.isBlank()) ? "?" : fullName.trim().substring(0, 1).toUpperCase();
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

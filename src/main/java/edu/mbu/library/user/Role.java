@@ -8,8 +8,7 @@ public enum Role {
     /** Page a user of this role lands on after login. */
     public String homePath() {
         return switch (this) {
-            case STUDENT -> "/student/dashboard";
-            case FACULTY -> "/faculty/dashboard";
+            case STUDENT, FACULTY -> "/home";
             case ADMIN -> "/admin/dashboard";
         };
     }

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!--
+  Shared page shell for students and faculty (same interface, as in the design sketch):
+  top bar with logo (top right) and nav, left side menu, main content, right-hand ID card.
+  Pages use it like:  <html th:replace="~{fragments/shell :: shell('Title', 'activeKey', ~{::main})}">
+-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="shell(title, active, content)">
+<head th:replace="~{fragments/layout :: head(${title})}"></head>
+<body>
+
+<header th:replace="~{fragments/layout :: topbar(${me})}"></header>
+
+<!-- Title bar features: Home | Modules | Lab Experiments | Tools | Resources -->
+<nav class="topnav" aria-label="Main">
+    <a th:href="@{/home}"      th:classappend="${active == 'home'} ? 'active'">Home</a>
+    <a th:href="@{/modules}"   th:classappend="${active == 'modules'} ? 'active'">Modules</a>
+    <a th:href="@{/labs}"      th:classappend="${active == 'labs'} ? 'active'">Lab Experiments</a>
+    <a th:href="@{/tools}"     th:classappend="${active == 'tools'} ? 'active'">Tools</a>
+    <a th:href="@{/resources}" th:classappend="${active == 'resources'} ? 'active'">Resources</a>
+</nav>
+
+<div class="shell">
+
+    <!-- Left side menu -->
+    <aside class="sidebar" aria-label="Side menu">
+        <a th:href="@{/modules}"     th:classappend="${active == 'modules'} ? 'active'"><span class="ico">&#128218;</span>Modules</a>
+        <a th:href="@{/labs}"        th:classappend="${active == 'labs'} ? 'active'"><span class="ico">&#129514;</span>Lab Exp</a>
+        <a th:href="@{/tools}"       th:classappend="${active == 'tools'} ? 'active'"><span class="ico">&#128295;</span>Tools</a>
+        <a th:href="@{/results}"     th:classappend="${active == 'results'} ? 'active'"><span class="ico">&#127942;</span>Results</a>
+        <a th:href="@{/codes}"       th:classappend="${active == 'codes'} ? 'active'"><span class="ico">&#128190;</span>Codes</a>
+        <a th:href="@{/editor}"      th:classappend="${active == 'editor'} ? 'active'"><span class="ico">&#128187;</span>Editor</a>
+        <hr>
+        <a th:href="@{/attendance}"  th:classappend="${active == 'attendance'} ? 'active'"><span class="ico">&#128197;</span>Attendance</a>
+        <a th:href="@{/marks}"       th:classappend="${active == 'marks'} ? 'active'"><span class="ico">&#128221;</span>Marks</a>
+        <a th:href="@{/assignments}" th:classappend="${active == 'assignments'} ? 'active'"><span class="ico">&#128194;</span>Assignments</a>
+    </aside>
+
+    <!-- Main content comes from the page -->
+    <div class="main" th:replace="${content}"></div>
+
+    <!-- Right side: ID card, then faculty card -->
+    <aside class="rightbar" aria-label="Profile cards" th:if="${me != null}">
+
+        <section class="idcard">
+            <div class="idcard-head">ID Card</div>
+            <div class="avatar-wrap">
+                <img th:if="${me.photoFile != null}" class="avatar"
+                     th:src="@{/files/photos/{f}(f=${me.photoFile})}" alt="Photo">
+                <div th:unless="${me.photoFile != null}" class="avatar placeholder" th:text="${me.initial}">A</div>
+            </div>
+            <dl>
+                <dt>Name</dt><dd th:text="${me.fullName}">Name</dd>
+                <th:block th:if="${me.rollNo != null}">
+                    <dt>Roll No</dt><dd th:text="${me.rollNo}">-</dd>
+                </th:block>
+                <th:block th:if="${me.role.name() == 'FACULTY'}">
+                    <dt>Role</dt><dd>Faculty</dd>
+                </th:block>
+                <th:block th:if="${me.semester != null}">
+                    <dt>Semester</dt><dd th:text="${me.semester}">-</dd>
+                </th:block>
+                <th:block th:if="${me.section != null}">
+                    <dt>Section</dt><dd th:text="${me.section}">-</dd>
+                </th:block>
+                <th:block th:if="${me.department != null}">
+                    <dt>Dept</dt><dd th:text="${me.department}">-</dd>
+                </th:block>
+            </dl>
+            <a class="card-link" th:href="@{/profile}">Edit profile &amp; photo</a>
+        </section>
+
+        <section class="idcard faculty-card" th:if="${me.mentor != null}">
+            <div class="idcard-head">Faculty</div>
+            <dl>
+                <dt>Name</dt><dd th:text="${me.mentor.fullName}">Faculty</dd>
+            </dl>
+            <ul class="links">
+                <li th:if="${me.mentor.githubUrl != null}">
+                    <a th:href="${me.mentor.githubUrl}" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                <li th:if="${me.mentor.linkedinUrl != null}">
+                    <a th:href="${me.mentor.linkedinUrl}" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+            </ul>
+            <a class="card-link" th:href="@{/people/{id}(id=${me.mentor.id})}">View more &amp; resume</a>
+        </section>
+
+    </aside>
+</div>
+
+</body>
+</html>
