@@ -55,7 +55,7 @@ for real deployment run the app in a container or under a locked-down account. S
 - [x] Phase 2: main layout (top nav, side menu, ID card, faculty card, profile with photo and resume upload)
 - [x] Phase 3: modules (semester, subjects, modules, PDFs and YouTube links posted by the subject's faculty)
 - [x] Phase 4: lab experiments with in-browser code editor (Python, Java, C++, C, SQL)
-- [ ] Phase 5: assignments
+- [x] Phase 5: assignments (posting, file submission, grading with feedback, private downloads)
 - [ ] Phase 6: attendance
 - [ ] Phase 7: marks and results
 - [ ] Phase 8: tools, resources, saved codes

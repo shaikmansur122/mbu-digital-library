@@ -28,9 +28,12 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/labs/run").hasAnyRole("STUDENT", "FACULTY")
                 .requestMatchers(HttpMethod.POST, "/labs/*/submit").hasRole("STUDENT")
                 .requestMatchers(HttpMethod.POST, "/labs/**").hasRole("FACULTY")
+                // Assignments: faculty post, grade and delete; students submit.
+                .requestMatchers(HttpMethod.POST, "/assignments/*/submit").hasRole("STUDENT")
+                .requestMatchers(HttpMethod.POST, "/assignments/**").hasRole("FACULTY")
                 // Students and faculty share the same interface; what they can do inside is decided per page.
                 .requestMatchers("/home", "/modules/**", "/labs/**", "/tools", "/resources", "/results", "/codes",
-                        "/editor", "/attendance", "/marks", "/assignments", "/profile", "/people/**", "/files/**")
+                        "/editor", "/attendance", "/marks", "/assignments/**", "/profile", "/people/**", "/files/**")
                     .hasAnyRole("STUDENT", "FACULTY")
                 .requestMatchers("/").authenticated()
                 .anyRequest().denyAll())

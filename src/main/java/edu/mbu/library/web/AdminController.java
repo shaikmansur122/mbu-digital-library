@@ -1,5 +1,6 @@
 package edu.mbu.library.web;
 
+import edu.mbu.library.assignments.AssignmentService;
 import edu.mbu.library.labs.LabService;
 import edu.mbu.library.modules.SubjectRepository;
 import edu.mbu.library.user.Role;
@@ -25,12 +26,15 @@ public class AdminController {
     private final PasswordEncoder encoder;
     private final SubjectRepository subjects;
     private final LabService labs;
+    private final AssignmentService assignments;
 
-    public AdminController(UserRepository users, PasswordEncoder encoder, SubjectRepository subjects, LabService labs) {
+    public AdminController(UserRepository users, PasswordEncoder encoder, SubjectRepository subjects,
+                           LabService labs, AssignmentService assignments) {
         this.users = users;
         this.encoder = encoder;
         this.subjects = subjects;
         this.labs = labs;
+        this.assignments = assignments;
     }
 
     @GetMapping("/admin/dashboard")
@@ -100,6 +104,7 @@ public class AdminController {
         } else {
             users.clearMentor(target);
             labs.deleteSubmissionsOf(target);
+            assignments.deleteSubmissionsOf(target);
             users.delete(target);
             redirect.addFlashAttribute("message", "Deleted account '" + target.getUsername() + "'");
         }

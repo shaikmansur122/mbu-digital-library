@@ -170,7 +170,11 @@
       if (r.problem && !r.stderr) { notes.push(r.problem); }
       if (r.timedOut) { notes.push('Stopped: the program ran longer than the time limit.'); }
       if (r.outputTruncated) { notes.push('Output was cut off (too long).'); }
-      if (!r.problem && !r.timedOut && r.exitCode) { notes.push('Exit code ' + r.exitCode); }
+      if (!r.problem && !r.timedOut && r.exitCode) {
+        // 0xC0000005 / 0xC00000FD are Windows access-violation and stack-overflow codes (segfault-style crashes)
+        var crashed = r.exitCode === -1073741819 || r.exitCode === -1073741571 || r.exitCode === 139 || r.exitCode === 134;
+        notes.push(crashed ? 'The program crashed (invalid memory access or stack overflow).' : 'Exit code ' + r.exitCode);
+      }
       return { stdout: r.stdout, stderr: r.stderr, note: notes.join('\n') };
     });
   }

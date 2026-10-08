@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell(${assignment.title}, 'assignments', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <p class="crumbs"><a th:href="@{/assignments}">&larr; Assignments</a></p>
+
+    <div class="card">
+        <span class="code" th:text="${assignment.subject.code}">CODE</span>
+        <h2 class="lab-title" th:text="${assignment.title}">Title</h2>
+        <p class="muted small">
+            <span th:text="${assignment.subject.name}">Subject</span> &middot;
+            <span class="badge light" th:text="${assignment.maxMarks} + ' marks'">10 marks</span>
+            <span th:if="${assignment.dueDate != null}">&middot; Due
+                <strong th:text="${#temporals.format(assignment.dueDate, 'dd MMM yyyy, HH:mm')}">date</strong></span>
+        </p>
+        <div class="statement" th:if="${assignment.description != null}" th:text="${assignment.description}">Instructions</div>
+        <p class="muted" th:unless="${assignment.description != null}">No instructions were given.</p>
+        <p th:if="${assignment.attachmentFile != null}">
+            <a th:href="@{/assignments/{id}/attachment(id=${assignment.id})}"
+               th:text="'&#128206; ' + ${assignment.attachmentName}">Question sheet</a>
+        </p>
+    </div>
+
+    <!-- ================= Student ================= -->
+    <th:block th:unless="${isFaculty}">
+        <div class="card">
+            <h2>Your submission</h2>
+
+            <th:block th:if="${submission != null}">
+                <p class="status done">
+                    Submitted <span th:text="${#temporals.format(submission.submittedAt, 'dd MMM yyyy, HH:mm')}">date</span>
+                    <span th:if="${submission.late}">(after the due date)</span>
+                    &middot; attempt <span th:text="${submission.attempts}">1</span>
+                </p>
+                <p>File:
+                    <a th:href="@{/assignments/submissions/{sid}/file(sid=${submission.id})}"
+                       th:text="${submission.originalName}">file</a></p>
+                <p th:if="${submission.note != null}" class="muted" th:text="'Your note: ' + ${submission.note}">note</p>
+
+                <div class="grade-box" th:if="${submission.graded}">
+                    <strong th:text="'Marks: ' + ${submission.marks} + ' / ' + ${assignment.maxMarks}">Marks</strong>
+                    <p th:if="${submission.feedback != null}" class="statement" th:text="${submission.feedback}">Feedback</p>
+                    <p class="muted small">Graded work cannot be changed.</p>
+                </div>
+                <p class="muted small" th:unless="${submission.graded}">Not graded yet. You can upload a new file to replace this one.</p>
+            </th:block>
+            <p class="status todo" th:if="${submission == null}">Not submitted yet.</p>
+
+            <form th:unless="${submission != null and submission.graded}"
+                  th:action="@{/assignments/{id}/submit(id=${assignment.id})}" method="post"
+                  enctype="multipart/form-data" class="stack">
+                <div class="field">
+                    <label for="file">Your file (PDF, Word, ZIP, image, notebook or code; up to 25 MB)</label>
+                    <input id="file" name="file" type="file" required>
+                </div>
+                <div class="field">
+                    <label for="note">Note for your faculty (optional)</label>
+                    <textarea id="note" name="note" rows="3" maxlength="1000"></textarea>
+                </div>
+                <button type="submit" class="btn" th:text="${submission == null} ? 'Submit' : 'Replace submission'">Submit</button>
+            </form>
+        </div>
+    </th:block>
+
+    <!-- ================= Faculty ================= -->
+    <th:block th:if="${isFaculty}">
+        <div class="card">
+            <h2>Submissions
+                <span class="muted small"
+                      th:text="'(' + ${submittedCount} + ' of ' + ${#lists.size(roster)} + ' submitted, ' + ${gradedCount} + ' graded)'"></span>
+            </h2>
+            <p class="muted" th:if="${#lists.isEmpty(roster)}">
+                No students are registered for semester <span th:text="${assignment.subject.semester}">1</span> yet.</p>
+
+            <table class="grading" th:unless="${#lists.isEmpty(roster)}">
+                <thead>
+                <tr><th>Roll no</th><th>Name</th><th>Status</th><th>Work</th><th>Marks &amp; feedback</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${roster}" th:with="sub=${submissionByStudent.get(s.id)}">
+                    <td th:text="${s.rollNo}">-</td>
+                    <td th:text="${s.fullName}">Name</td>
+                    <td>
+                        <span class="status todo" th:if="${sub == null}">Not submitted</span>
+                        <th:block th:if="${sub != null}">
+                            <span class="status done" th:text="${sub.late} ? 'Submitted (late)' : 'Submitted'">Submitted</span>
+                            <div class="muted small" th:text="${#temporals.format(sub.submittedAt, 'dd MMM, HH:mm')} + ' · attempt ' + ${sub.attempts}"></div>
+                        </th:block>
+                    </td>
+                    <td>
+                        <th:block th:if="${sub != null}">
+                            <a th:href="@{/assignments/submissions/{sid}/file(sid=${sub.id})}" th:text="${sub.originalName}">file</a>
+                            <div class="muted small" th:if="${sub.note != null}" th:text="'Note: ' + ${sub.note}"></div>
+                        </th:block>
+                        <span th:if="${sub == null}">-</span>
+                    </td>
+                    <td>
+                        <form th:if="${sub != null}" th:action="@{/assignments/submissions/{sid}/grade(sid=${sub.id})}"
+                              method="post" class="grade-form">
+                            <input type="number" name="marks" min="0" th:max="${assignment.maxMarks}" required
+                                   th:value="${sub.marks}" aria-label="Marks">
+                            <span class="muted small" th:text="'/ ' + ${assignment.maxMarks}"></span>
+                            <input type="text" name="feedback" maxlength="1000" placeholder="Feedback (optional)"
+                                   th:value="${sub.feedback}" aria-label="Feedback">
+                            <button type="submit" class="btn small" th:text="${sub.graded} ? 'Update' : 'Grade'">Grade</button>
+                        </form>
+                        <form th:if="${sub != null and sub.graded}" th:action="@{/assignments/submissions/{sid}/reopen(sid=${sub.id})}"
+                              method="post" onsubmit="return confirm('Remove the grade and let the student resubmit?');">
+                            <button type="submit" class="link-btn">Reopen for resubmission</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+</main>
+</body>
+</html>

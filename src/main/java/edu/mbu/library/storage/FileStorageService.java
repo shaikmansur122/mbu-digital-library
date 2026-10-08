@@ -24,6 +24,14 @@ public class FileStorageService {
     public static final String PHOTOS = "photos";
     public static final String RESUMES = "resumes";
     public static final String MATERIALS = "materials";
+    /** Question sheets attached by faculty. */
+    public static final String ASSIGNMENTS = "assignments";
+    /** Student work. Private: only the student and the subject's faculty may download it. */
+    public static final String SUBMISSIONS = "submissions";
+
+    private static final String[] ASSIGNMENT_EXTENSIONS = {
+            "pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx", "txt", "csv", "zip", "png", "jpg", "jpeg",
+            "ipynb", "py", "java", "c", "cpp", "sql"};
 
     private final Path root;
 
@@ -63,9 +71,51 @@ public class FileStorageService {
         return store(kind, file, ext);
     }
 
-    /** Returns the stored file, or null if the kind is unknown, the name is unsafe, or the file is missing. */
+    /**
+     * Saves an assignment question sheet or a student's submission. Any of the allowed document, archive,
+     * image or source-code types is accepted; these files are only ever served as downloads, never displayed.
+     */
+    public String saveAssignmentFile(String kind, MultipartFile file) throws IOException {
+        String ext = extensionOf(file, ASSIGNMENT_EXTENSIONS);
+        try (InputStream in = file.getInputStream()) {
+            byte[] head = in.readNBytes(8);
+            String start = new String(head, StandardCharsets.ISO_8859_1);
+            boolean ok = switch (ext) {
+                case "pdf" -> start.startsWith("%PDF-");
+                case "zip", "docx", "pptx", "xlsx" -> start.startsWith("PK");
+                case "png" -> head.length >= 4 && (head[0] & 0xFF) == 0x89 && start.startsWith("\u0089PNG");
+                case "jpg", "jpeg" -> head.length >= 3 && (head[0] & 0xFF) == 0xFF && (head[1] & 0xFF) == 0xD8;
+                default -> true;
+            };
+            if (!ok) {
+                throw new IllegalArgumentException("That file does not look like a real ." + ext + " file.");
+            }
+        }
+        return store(kind, file, ext);
+    }
+
+    /** The uploaded file's own name, cleaned for showing to people and for the download header. */
+    public static String cleanOriginalName(MultipartFile file) {
+        String name = file.getOriginalFilename() == null ? "file" : file.getOriginalFilename();
+        name = name.replace('\\', '/');
+        name = name.substring(name.lastIndexOf('/') + 1).replaceAll("[\\p{Cntrl}\"<>:*?|]", "_").trim();
+        if (name.isEmpty()) {
+            name = "file";
+        }
+        return name.length() > 120 ? name.substring(name.length() - 120) : name;
+    }
+
+    /** Returns a stored file from the public kinds (photos, resumes, module PDFs), or null. */
     public Resource load(String kind, String name) {
         if (!PHOTOS.equals(kind) && !RESUMES.equals(kind) && !MATERIALS.equals(kind)) {
+            return null;
+        }
+        return loadAny(kind, name);
+    }
+
+    /** Returns a stored file of any kind. Callers must check permissions themselves (used for private files). */
+    public Resource loadAny(String kind, String name) {
+        if (name == null) {
             return null;
         }
         Path dir = root.resolve(kind).normalize();

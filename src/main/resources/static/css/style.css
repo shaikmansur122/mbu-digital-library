@@ -375,3 +375,12 @@ p.status { border-radius: 6px; padding: 8px 12px; font-size: .88rem; font-weight
 @media (max-width: 760px) {
   .editor-io { grid-template-columns: 1fr; }
 }
+
+/* ================= Phase 5: assignments ================= */
+.grade-box { background: #e8f6ec; border: 1px solid #b9e2c6; border-radius: 8px; padding: 12px 14px; margin: 12px 0; }
+.grade-box .statement { background: #fff; margin: 8px 0 0; }
+.grading td { vertical-align: top; }
+.grade-form { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 4px; }
+.grade-form input[type="number"] { width: 70px; }
+.grade-form input[type="text"] { flex: 1 1 160px; min-width: 130px; }
+input[type="file"] { padding: 7px; background: #fff; }

@@ -25,16 +25,14 @@ public class PageController {
             "/attendance", new Section("attendance", "Attendance", "Phase 6",
                     "Subject-wise attendance."),
             "/marks", new Section("marks", "Marks", "Phase 7",
-                    "Marks entered by faculty."),
-            "/assignments", new Section("assignments", "Assignments", "Phase 5",
-                    "Assignments posted by faculty, with submission and grading."));
+                    "Marks entered by faculty."));
 
     @GetMapping("/home")
     public String home() {
         return "home";
     }
 
-    @GetMapping({"/tools", "/resources", "/results", "/codes", "/attendance", "/marks", "/assignments"})
+    @GetMapping({"/tools", "/resources", "/results", "/codes", "/attendance", "/marks"})
     public String section(HttpServletRequest request, Model model) {
         Section s = SECTIONS.get(request.getServletPath());
         model.addAttribute("active", s.key());

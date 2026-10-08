@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Assignments', 'assignments', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <!-- ================= Faculty ================= -->
+    <th:block th:if="${isFaculty}">
+        <div class="card">
+            <h2>Assignments you posted</h2>
+            <p class="muted" th:if="${#lists.isEmpty(assignmentList)}">You have not posted any assignment yet.</p>
+
+            <table th:unless="${#lists.isEmpty(assignmentList)}">
+                <thead>
+                <tr><th>Assignment</th><th>Subject</th><th>Due</th><th>Marks</th><th>Submitted</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${assignmentList}">
+                    <td><a th:href="@{/assignments/{id}(id=${a.id})}" th:text="${a.title}">Title</a></td>
+                    <td><span th:text="${a.subject.name}">Subject</span>
+                        <span class="muted small" th:text="'(Sem ' + ${a.subject.semester} + ')'"></span></td>
+                    <td th:text="${a.dueDate != null} ? ${#temporals.format(a.dueDate, 'dd MMM yyyy, HH:mm')} : '-'">-</td>
+                    <td th:text="${a.maxMarks}">10</td>
+                    <td><strong th:text="${submittedCounts.get(a.id)}">0</strong>
+                        <span class="muted" th:text="'/ ' + ${classSizes.get(a.id)}">/ 0</span></td>
+                    <td>
+                        <form th:action="@{/assignments/{id}/delete(id=${a.id})}" method="post"
+                              onsubmit="return confirm('Delete this assignment and all submitted files?');">
+                            <button type="submit" class="btn secondary small">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <details th:attr="open=${error != null or #lists.isEmpty(assignmentList)} ? 'open'">
+                <summary class="summary-btn">+ Post an assignment</summary>
+
+                <p class="muted" th:if="${#lists.isEmpty(ownedSubjects)}">
+                    You need a subject first. <a th:href="@{/modules}">Create one under Modules</a>.
+                </p>
+
+                <form th:unless="${#lists.isEmpty(ownedSubjects)}" th:action="@{/assignments}" method="post"
+                      enctype="multipart/form-data" class="stack">
+                    <div class="grid">
+                        <div class="field">
+                            <label for="subjectId">Subject</label>
+                            <select id="subjectId" name="subjectId" required>
+                                <option th:each="s : ${ownedSubjects}" th:value="${s.id}"
+                                        th:text="${s.code + ' - ' + s.name + ' (Sem ' + s.semester + ')'}"></option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="title">Title</label>
+                            <input id="title" name="title" type="text" maxlength="150" required
+                                   placeholder="e.g. Assignment 1: Data cleaning">
+                        </div>
+                        <div class="field">
+                            <label for="dueDate">Due date (optional)</label>
+                            <input id="dueDate" name="dueDate" type="datetime-local">
+                        </div>
+                        <div class="field">
+                            <label for="maxMarks">Maximum marks</label>
+                            <input id="maxMarks" name="maxMarks" type="number" min="1" max="100" value="10" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="description">Instructions</label>
+                        <textarea id="description" name="description" rows="5" maxlength="4000"
+                                  placeholder="What should the students do?"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="attachment">Question sheet (optional, up to 25 MB)</label>
+                        <input id="attachment" name="attachment" type="file">
+                    </div>
+                    <button type="submit" class="btn">Post assignment</button>
+                    <p class="muted small">Visible to all students of the subject's semester.</p>
+                </form>
+            </details>
+        </div>
+    </th:block>
+
+    <!-- ================= Student ================= -->
+    <th:block th:unless="${isFaculty}">
+        <div class="card">
+            <h2>Assignments</h2>
+            <p class="muted" th:if="${noSemester}">Your semester has not been set yet, so no assignments can be shown. Please ask the admin.</p>
+            <p class="muted" th:if="${!noSemester and #lists.isEmpty(assignmentList)}">
+                No assignments have been posted for your semester yet.</p>
+
+            <div class="labs" th:unless="${#lists.isEmpty(assignmentList)}">
+                <a class="lab-card" th:each="a : ${assignmentList}" th:href="@{/assignments/{id}(id=${a.id})}">
+                    <div class="lab-top">
+                        <strong th:text="${a.title}">Title</strong>
+                        <span class="badge light" th:text="${a.maxMarks} + ' marks'">10 marks</span>
+                    </div>
+                    <small class="muted" th:text="${a.subject.name}">Subject</small>
+                    <small th:if="${a.dueDate != null}" th:text="'Due ' + ${#temporals.format(a.dueDate, 'dd MMM yyyy, HH:mm')}">Due</small>
+
+                    <span class="status done" th:if="${mySubmissions.containsKey(a.id) and mySubmissions.get(a.id).graded}"
+                          th:text="'Graded: ' + ${mySubmissions.get(a.id).marks} + ' / ' + ${a.maxMarks}">Graded</span>
+                    <span class="status done" th:if="${mySubmissions.containsKey(a.id) and !mySubmissions.get(a.id).graded}"
+                          th:text="${mySubmissions.get(a.id).late} ? 'Submitted (late)' : 'Submitted'">Submitted</span>
+                    <span class="status todo" th:unless="${mySubmissions.containsKey(a.id)}">Not submitted</span>
+                </a>
+            </div>
+        </div>
+    </th:block>
+</main>
+</body>
+</html>
