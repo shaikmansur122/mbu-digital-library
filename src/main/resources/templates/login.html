@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Login')}"></head>
+<body>
+<div class="login-wrap">
+    <header th:replace="~{fragments/layout :: topbar(null)}"></header>
+
+    <main class="login-main">
+        <div class="card login-card">
+            <h2>Sign in</h2>
+
+            <div class="alert err" th:if="${param.error}">Invalid username or password.</div>
+            <div class="alert ok" th:if="${param.logout}">You have been logged out.</div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="field">
+                    <label for="username">Username / Roll number</label>
+                    <input id="username" name="username" type="text" autofocus required autocomplete="username">
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn" style="width:100%">Log in</button>
+            </form>
+
+            <!-- DEV ONLY: remove in the final cleanup phase -->
+            <p class="hint">
+                Sample accounts for testing:<br>
+                admin / Admin@123<br>
+                faculty1 / Faculty@123<br>
+                student1 / Student@123
+            </p>
+        </div>
+    </main>
+</div>
+</body>
+</html>

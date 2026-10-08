@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' | MBU Digital Library'">MBU Digital Library</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Top bar: page title on the left, MBU logo on the top right -->
+<header class="topbar" th:fragment="topbar(user)">
+    <div class="titles">
+        <h1>Data Science &ndash; Digital Library</h1>
+        <p>Mohan Babu University</p>
+    </div>
+    <div class="right">
+        <div class="who" th:if="${user != null}">
+            <strong th:text="${user.fullName}">Name</strong>
+            <span class="badge" th:text="${user.role}">ROLE</span>
+        </div>
+        <form th:if="${user != null}" th:action="@{/logout}" method="post">
+            <button type="submit" class="btn secondary small">Log out</button>
+        </form>
+        <img class="logo" th:src="@{/images/mbu-logo.jpg}" alt="Mohan Babu University">
+    </div>
+</header>
+
+</body>
+</html>

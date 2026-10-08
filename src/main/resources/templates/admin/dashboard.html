@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topbar(${user})}"></header>
+
+<main class="content">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card">
+        <h2>Create account</h2>
+        <form th:action="@{/admin/users}" th:object="${form}" method="post">
+            <div class="grid">
+                <div class="field">
+                    <label for="role">Role</label>
+                    <select id="role" th:field="*{role}">
+                        <option value="">-- choose --</option>
+                        <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+                    </select>
+                    <div class="error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+                </div>
+                <div class="field">
+                    <label for="username">Username</label>
+                    <input id="username" type="text" th:field="*{username}">
+                    <div class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" th:field="*{password}">
+                    <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                </div>
+                <div class="field">
+                    <label for="fullName">Full name</label>
+                    <input id="fullName" type="text" th:field="*{fullName}">
+                    <div class="error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                </div>
+                <div class="field">
+                    <label for="email">Email (optional)</label>
+                    <input id="email" type="text" th:field="*{email}">
+                </div>
+                <div class="field">
+                    <label for="rollNo">Roll number (students)</label>
+                    <input id="rollNo" type="text" th:field="*{rollNo}">
+                </div>
+                <div class="field">
+                    <label for="department">Department</label>
+                    <input id="department" type="text" th:field="*{department}">
+                </div>
+                <div class="field">
+                    <label for="section">Section</label>
+                    <input id="section" type="text" th:field="*{section}">
+                </div>
+                <div class="field">
+                    <label for="semester">Semester</label>
+                    <input id="semester" type="number" min="1" max="8" th:field="*{semester}">
+                </div>
+            </div>
+            <button type="submit" class="btn">Create account</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>All accounts (<span th:text="${#lists.size(accounts)}">0</span>)</h2>
+        <table>
+            <thead>
+            <tr><th>Username</th><th>Name</th><th>Role</th><th>Roll no</th><th>Dept</th><th>Sec</th><th>Sem</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${accounts}">
+                <td th:text="${a.username}"></td>
+                <td th:text="${a.fullName}"></td>
+                <td><span class="badge" th:text="${a.role}"></span></td>
+                <td th:text="${a.rollNo}"></td>
+                <td th:text="${a.department}"></td>
+                <td th:text="${a.section}"></td>
+                <td th:text="${a.semester}"></td>
+                <td>
+                    <form th:if="${a.username != user.username}"
+                          th:action="@{/admin/users/{id}/delete(id=${a.id})}" method="post"
+                          onsubmit="return confirm('Delete this account?');">
+                        <button type="submit" class="btn secondary small">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>
