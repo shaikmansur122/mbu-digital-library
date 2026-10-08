@@ -215,8 +215,11 @@
         language: MONACO_LANG[language],
         readOnly: readOnly,
         automaticLayout: true,
+        theme: 'vs-dark',
         minimap: { enabled: false },
         fontSize: 14,
+        fontFamily: '"JetBrains Mono", Consolas, "Courier New", monospace',
+        padding: { top: 12, bottom: 12 },
         scrollBeyondLastLine: false,
         tabSize: 4
       });

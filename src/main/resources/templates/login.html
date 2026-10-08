@@ -7,7 +7,10 @@
 
     <main class="login-main">
         <div class="card login-card">
-            <h2>Sign in</h2>
+            <div class="welcome">
+                <h2>Welcome back</h2>
+                <p>Sign in to continue to your digital library</p>
+            </div>
 
             <div class="alert err" th:if="${param.error}">Invalid username or password.</div>
             <div class="alert ok" th:if="${param.logout}">You have been logged out.</div>
@@ -21,7 +24,7 @@
                     <label for="password">Password</label>
                     <input id="password" name="password" type="password" required autocomplete="current-password">
                 </div>
-                <button type="submit" class="btn" style="width:100%">Log in</button>
+                <button type="submit" class="btn">Log in</button>
             </form>
 
             <!-- DEV ONLY: remove in the final cleanup phase -->

@@ -3,12 +3,12 @@
       th:replace="~{fragments/shell :: shell('Home', 'home', ~{::main})}">
 <body>
 <main class="main">
-    <div class="card">
+    <div class="card hero">
         <h2>Welcome, <span th:text="${me.fullName}">Name</span></h2>
-        <p class="muted" th:if="${me.role.name() == 'STUDENT'}">
+        <p th:if="${me.role.name() == 'STUDENT'}">
             Everything for your course is here: modules, lab experiments, assignments, attendance and marks.
         </p>
-        <p class="muted" th:if="${me.role.name() == 'FACULTY'}">
+        <p th:if="${me.role.name() == 'FACULTY'}">
             Upload modules and resources, assign lab experiments and assignments, and track your students.
         </p>
     </div>
