@@ -17,5 +17,7 @@ public interface LabSubmissionRepository extends JpaRepository<LabSubmission, Lo
 
     long countByExperiment(LabExperiment experiment);
 
+    List<LabSubmission> findByStudentOrderBySubmittedAtDesc(User student);
+
     void deleteByStudent(User student);
 }

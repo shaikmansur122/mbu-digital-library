@@ -26,6 +26,8 @@ public class FileStorageService {
     public static final String MATERIALS = "materials";
     /** Question sheets attached by faculty. */
     public static final String ASSIGNMENTS = "assignments";
+    /** Resources shared by faculty with everyone. */
+    public static final String LIBRARY = "library";
     /** Student work. Private: only the student and the subject's faculty may download it. */
     public static final String SUBMISSIONS = "submissions";
 

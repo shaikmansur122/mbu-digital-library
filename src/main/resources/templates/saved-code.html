@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell(${saved.title}, 'codes', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <p class="crumbs"><a th:href="@{/codes}">&larr; My Codes</a></p>
+
+    <div class="card">
+        <form th:action="@{/codes/{id}(id=${saved.id})}" method="post">
+            <div class="field">
+                <label for="title">Title</label>
+                <input id="title" name="title" type="text" maxlength="100" required th:value="${saved.title}">
+            </div>
+            <div th:replace="~{fragments/editor :: editor(${saved.language.name()}, ${saved.code}, true, false, 'code')}"></div>
+            <div class="save-row">
+                <button type="submit" class="btn">Save changes</button>
+                <span class="muted small">
+                    Saved <span th:text="${#temporals.format(saved.createdAt, 'dd MMM yyyy')}">date</span>,
+                    last changed <span th:text="${#temporals.format(saved.updatedAt, 'dd MMM yyyy, HH:mm')}">date</span>
+                </span>
+            </div>
+        </form>
+        <form th:action="@{/codes/{id}/delete(id=${saved.id})}" method="post" class="delete-row"
+              onsubmit="return confirm('Delete this saved code?');">
+            <button type="submit" class="btn secondary small">Delete</button>
+        </form>
+    </div>
+    <script th:src="@{/js/code-editor.js}"></script>
+</main>
+</body>
+</html>

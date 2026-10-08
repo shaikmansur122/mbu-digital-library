@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Codes', 'codes', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card">
+        <div class="att-head">
+            <div>
+                <h2>My saved codes</h2>
+                <p class="muted small">Private to you. Save code from the <a th:href="@{/editor}">Editor</a>
+                    and open it here later (<span th:text="${#lists.size(savedList)}">0</span> of <span th:text="${maxCodes}">100</span>).</p>
+            </div>
+            <a class="btn small" th:href="@{/editor}">+ New code</a>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(savedList)}">You have not saved any code yet.</p>
+
+        <table th:unless="${#lists.isEmpty(savedList)}">
+            <thead><tr><th>Title</th><th>Language</th><th>Last changed</th></tr></thead>
+            <tbody>
+            <tr th:each="c : ${savedList}">
+                <td><a th:href="@{/codes/{id}(id=${c.id})}" th:text="${c.title}">Title</a></td>
+                <td><span class="badge light" th:text="${c.language.label}">Python</span></td>
+                <td th:text="${#temporals.format(c.updatedAt, 'dd MMM yyyy, HH:mm')}">date</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card" th:if="${isStudent}">
+        <h2>My lab submissions</h2>
+        <p class="muted" th:if="${#lists.isEmpty(labList)}">You have not submitted any lab experiment yet.</p>
+        <table th:unless="${#lists.isEmpty(labList)}">
+            <thead><tr><th>Experiment</th><th>Subject</th><th>Language</th><th>Submitted</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="s : ${labList}">
+                <td><a th:href="@{/labs/{id}(id=${s.experiment.id})}" th:text="${s.experiment.title}">Experiment</a></td>
+                <td th:text="${s.experiment.subject.name}">Subject</td>
+                <td th:text="${s.experiment.language.label}">Python</td>
+                <td th:text="${#temporals.format(s.submittedAt, 'dd MMM yyyy, HH:mm')}">date</td>
+                <td><span class="status todo" th:if="${s.late}">late</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

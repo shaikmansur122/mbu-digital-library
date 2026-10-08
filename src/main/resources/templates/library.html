@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell(${isTools} ? 'Tools' : 'Resources', ${active}, ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card">
+        <h2 th:text="${isTools} ? 'Tools' : 'Resources'">Tools</h2>
+        <p class="muted small" th:if="${isTools}">Useful tools and websites shared by your faculty.</p>
+        <p class="muted small" th:unless="${isTools}">Notes, books, datasets and links shared by your faculty.</p>
+
+        <form th:action="${isTools} ? @{/tools} : @{/resources}" method="get" class="pick-form">
+            <div class="field">
+                <label for="q">Search</label>
+                <input id="q" name="q" type="search" th:value="${query}" placeholder="Search by title or description">
+            </div>
+            <div class="field">
+                <label for="subjectId">Subject</label>
+                <select id="subjectId" name="subjectId">
+                    <option value="">All</option>
+                    <option value="general" th:if="${hasGeneral}" th:selected="${selectedSubject == 'general'}">General</option>
+                    <option th:each="s : ${filterSubjects}" th:value="${s.id}" th:selected="${selectedSubject == s.id.toString()}"
+                            th:text="${s.code + ' - ' + s.name}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn secondary">Filter</button>
+            <a class="btn secondary" th:href="${isTools} ? @{/tools} : @{/resources}"
+               th:if="${query != '' or selectedSubject != ''}">Clear</a>
+        </form>
+    </div>
+
+    <div class="card" th:if="${#lists.isEmpty(itemList)}">
+        <p class="muted" th:if="${totalCount == 0}">
+            Nothing has been shared yet.<span th:if="${isFaculty}"> Use the form below to add the first one.</span></p>
+        <p class="muted" th:if="${totalCount > 0}">No items match your search.</p>
+    </div>
+
+    <div class="items" th:unless="${#lists.isEmpty(itemList)}">
+        <article class="item card" th:each="i : ${itemList}">
+            <div class="item-top">
+                <h3 th:text="${i.title}">Title</h3>
+                <span class="badge light" th:if="${i.subject != null}" th:text="${i.subject.code}">CODE</span>
+                <span class="badge light" th:if="${i.subject == null}">General</span>
+            </div>
+            <p class="muted" th:if="${i.description != null}" th:text="${i.description}">Description</p>
+            <div class="item-actions">
+                <a class="btn small" th:if="${i.url != null}" th:href="${i.url}" target="_blank"
+                   rel="noopener noreferrer" th:text="${isTools} ? 'Open tool' : 'Open link'">Open</a>
+                <a class="btn small" th:if="${i.file}" th:href="@{/library/{id}/file(id=${i.id})}" target="_blank"
+                   th:text="'Download ' + ${i.originalName}">Download</a>
+            </div>
+            <div class="item-foot muted small">
+                Shared by <span th:text="${i.postedBy.fullName}">Faculty</span>
+                on <span th:text="${#temporals.format(i.createdAt, 'dd MMM yyyy')}">date</span>
+                <form th:if="${isFaculty and i.postedBy.id == meId}" th:action="@{/library/{id}/delete(id=${i.id})}"
+                      method="post" class="inline" onsubmit="return confirm('Remove this item for everyone?');">
+                    <button type="submit" class="link-btn">Remove</button>
+                </form>
+            </div>
+        </article>
+    </div>
+
+    <!-- Faculty: share something -->
+    <div class="card" th:if="${isFaculty}">
+        <details th:attr="open=${error != null} ? 'open'">
+            <summary class="summary-btn" th:text="${isTools} ? '+ Share a tool' : '+ Share a resource'">+ Share</summary>
+            <form th:action="${isTools} ? @{/tools} : @{/resources}" method="post" enctype="multipart/form-data" class="stack">
+                <div class="grid">
+                    <div class="field">
+                        <label for="title">Title</label>
+                        <input id="title" name="title" type="text" maxlength="150" required
+                               th:placeholder="${isTools} ? 'e.g. Google Colab' : 'e.g. Statistics cheat sheet'">
+                    </div>
+                    <div class="field">
+                        <label for="subjectIdNew">Subject (optional)</label>
+                        <select id="subjectIdNew" name="subjectId">
+                            <option value="">General</option>
+                            <option th:each="s : ${ownedSubjects}" th:value="${s.id}"
+                                    th:text="${s.code + ' - ' + s.name}"></option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="url" th:text="${isTools} ? 'Link' : 'Link (optional if you upload a file)'">Link</label>
+                        <input id="url" name="url" type="text" maxlength="500" placeholder="https://..." th:required="${isTools}">
+                    </div>
+                    <div class="field" th:unless="${isTools}">
+                        <label for="file">File (up to 25 MB)</label>
+                        <input id="file" name="file" type="file">
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="description">Description (optional)</label>
+                    <textarea id="description" name="description" rows="3" maxlength="1000"></textarea>
+                </div>
+                <button type="submit" class="btn">Share</button>
+                <p class="muted small">Visible to every student and faculty member.</p>
+            </form>
+        </details>
+    </div>
+</main>
+</body>
+</html>

@@ -58,5 +58,5 @@ for real deployment run the app in a container or under a locked-down account. S
 - [x] Phase 5: assignments (posting, file submission, grading with feedback, private downloads)
 - [x] Phase 6: attendance (faculty take it per subject and day, students see percentages, report and CSV)
 - [x] Phase 7: marks and results (assessments, marks grid, grades, SGPA / CGPA, CSV export)
-- [ ] Phase 8: tools, resources, saved codes
+- [x] Phase 8: tools, resources, saved codes (shared by faculty, searchable; private saved code snippets)
 - [ ] Phase 9: polish

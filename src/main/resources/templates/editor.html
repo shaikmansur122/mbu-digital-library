@@ -3,13 +3,22 @@
       th:replace="~{fragments/shell :: shell('Editor', 'editor', ~{::main})}">
 <body>
 <main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
     <div class="card">
         <h2>Practice editor</h2>
         <p class="muted small">
-            Try out code in Python, Java, C++, C or SQL. Nothing here is saved or submitted:
-            graded work is done from <a th:href="@{/labs}">Lab Experiments</a>.
+            Try out code in Python, Java, C++, C or SQL. Nothing is saved unless you press
+            <em>Save to my Codes</em>. Graded work is done from <a th:href="@{/labs}">Lab Experiments</a>.
         </p>
-        <div th:replace="~{fragments/editor :: editor('PYTHON', '', true, false, 'code')}"></div>
+        <form th:action="@{/codes}" method="post">
+            <div th:replace="~{fragments/editor :: editor('PYTHON', '', true, false, 'code')}"></div>
+            <div class="save-row">
+                <input type="text" name="title" maxlength="100" placeholder="Title, e.g. Linear regression demo" aria-label="Title">
+                <button type="submit" class="btn secondary">Save to my Codes</button>
+            </div>
+        </form>
     </div>
     <script th:src="@{/js/code-editor.js}"></script>
 </main>

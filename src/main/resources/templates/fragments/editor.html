@@ -16,7 +16,7 @@
 
     <div class="editor-toolbar">
         <label th:if="${selectable}" class="lang-pick">Language
-            <select class="lang-select">
+            <select class="lang-select" name="language">
                 <option value="PYTHON" th:selected="${language == 'PYTHON'}">Python</option>
                 <option value="JAVA" th:selected="${language == 'JAVA'}">Java</option>
                 <option value="CPP" th:selected="${language == 'CPP'}">C++</option>

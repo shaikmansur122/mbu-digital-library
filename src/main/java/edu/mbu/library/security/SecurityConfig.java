@@ -37,9 +37,12 @@ public class SecurityConfig {
                 // Marks: faculty enter them and export; students only read their own.
                 .requestMatchers(HttpMethod.POST, "/marks/**").hasRole("FACULTY")
                 .requestMatchers("/marks/export.csv").hasRole("FACULTY")
+                // Tools and resources: only faculty share or remove them; everyone logged in can read.
+                .requestMatchers(HttpMethod.POST, "/tools", "/resources", "/library/**").hasRole("FACULTY")
                 // Students and faculty share the same interface; what they can do inside is decided per page.
-                .requestMatchers("/home", "/modules/**", "/labs/**", "/tools", "/resources", "/results", "/codes",
-                        "/editor", "/attendance/**", "/marks/**", "/assignments/**", "/profile", "/people/**", "/files/**")
+                .requestMatchers("/home", "/modules/**", "/labs/**", "/tools", "/resources", "/results", "/codes/**",
+                        "/editor", "/attendance/**", "/marks/**", "/assignments/**", "/profile", "/people/**", "/files/**",
+                        "/library/**")
                     .hasAnyRole("STUDENT", "FACULTY")
                 .requestMatchers("/").authenticated()
                 .anyRequest().denyAll())
