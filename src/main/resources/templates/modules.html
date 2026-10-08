@@ -46,6 +46,10 @@
                         <input id="name" name="name" type="text" maxlength="120" required placeholder="e.g. Machine Learning">
                     </div>
                     <div class="field">
+                        <label for="credits">Credits</label>
+                        <input id="credits" name="credits" type="number" min="1" max="10" value="3" required>
+                    </div>
+                    <div class="field">
                         <label for="semester">Semester</label>
                         <select id="semester" name="semester" required>
                             <option th:each="s : ${semesters}" th:value="${s}" th:text="${s}"

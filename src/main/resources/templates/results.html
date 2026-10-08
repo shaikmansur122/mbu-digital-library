@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Results', 'results', ~{::main})}">
+<body>
+<main class="main">
+
+    <!-- ================= Student ================= -->
+    <th:block th:unless="${isFaculty}">
+        <div class="card">
+            <h2>My results</h2>
+            <p class="muted" th:if="${noSemester}">Your semester has not been set yet. Please ask the admin.</p>
+            <div class="overall" th:unless="${#lists.isEmpty(semesters)}">
+                <div class="big" th:text="${cgpaText}">0.00</div>
+                <div><strong>CGPA</strong><br>
+                    <span class="muted small">Credit-weighted average of grade points over subjects with a final grade.</span></div>
+            </div>
+            <p class="muted" th:if="${!noSemester and #lists.isEmpty(semesters)}">No marks have been entered for you yet.</p>
+        </div>
+
+        <div class="card" th:each="sem : ${semesters}">
+            <div class="att-head">
+                <h2>Semester <span th:text="${sem.semester}">1</span></h2>
+                <div class="att-pct"><span th:text="${sem.sgpaText()}">0.00</span>
+                    <div class="muted small">SGPA</div></div>
+            </div>
+            <table>
+                <thead>
+                <tr><th>Subject</th><th>Credits</th><th>Total</th><th>%</th><th>Grade</th><th>Points</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${sem.results}">
+                    <td><span class="code" th:text="${r.subject().code}">CODE</span>
+                        <span th:text="${r.subject().name}">Subject</span></td>
+                    <td th:text="${r.subject().creditsOrDefault}">3</td>
+                    <td th:text="${r.hasMarks()} ? ${r.obtainedText()} + ' / ' + ${r.maxOfEntered()} : '-'">-</td>
+                    <td th:text="${r.hasMarks()} ? ${r.percentText()} : '-'">-</td>
+                    <td><strong th:text="${r.hasMarks()} ? ${r.grade().letter()} : '-'">A</strong></td>
+                    <td th:text="${r.complete()} ? ${r.grade().points()} : '-'">9</td>
+                    <td>
+                        <span th:if="${!r.hasMarks()}" class="muted">No marks yet</span>
+                        <span th:if="${r.hasMarks() and !r.complete()}" class="status todo">Provisional</span>
+                        <span th:if="${r.complete() and r.grade().pass()}" class="status done">Pass</span>
+                        <span th:if="${r.complete() and !r.grade().pass()}" class="status todo">Fail</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="muted small" th:unless="${#lists.isEmpty(semesters)}">
+            Grades: O 90+, A+ 80+, A 70+, B+ 60+, B 50+, C 40+ (pass), F below 40. Grade points 10, 9, 8, 7, 6, 5, 0.</p>
+    </th:block>
+
+    <!-- ================= Faculty ================= -->
+    <th:block th:if="${isFaculty}">
+        <div class="card">
+            <h2>Results of your subjects</h2>
+            <p class="muted" th:if="${#lists.isEmpty(statsList)}">You have no subjects yet.</p>
+            <p class="muted small" th:unless="${#lists.isEmpty(statsList)}">
+                Statistics cover students whose marks are complete for every assessment.
+                Enter marks under <a th:href="@{/marks}">Marks</a>.</p>
+
+            <div class="table-scroll" th:unless="${#lists.isEmpty(statsList)}">
+                <table>
+                    <thead>
+                    <tr><th>Subject</th><th>Students</th><th>Complete</th><th>Average</th><th>Highest</th><th>Pass</th>
+                        <th th:each="g : ${gradeOrder}" th:text="${g}">O</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="st : ${statsList}">
+                        <td><span class="code" th:text="${st.subject().code}">CODE</span>
+                            <a th:href="@{/marks(subjectId=${st.subject().id})}" th:text="${st.subject().name}">Subject</a>
+                            <span class="muted small" th:text="'(Sem ' + ${st.subject().semester} + ')'"></span></td>
+                        <td th:text="${st.students()}">0</td>
+                        <td th:text="${st.complete()}">0</td>
+                        <td th:text="${st.averageText()}">-</td>
+                        <td th:text="${st.highestText()}">-</td>
+                        <td th:text="${st.passText()}">-</td>
+                        <td th:each="g : ${gradeOrder}" th:text="${st.distribution().get(g)}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </th:block>
+</main>
+</body>
+</html>

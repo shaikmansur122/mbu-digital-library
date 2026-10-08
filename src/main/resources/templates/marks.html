@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Marks', 'marks', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <!-- ================= Faculty ================= -->
+    <th:block th:if="${isFaculty}">
+        <div class="card" th:if="${#lists.isEmpty(ownedSubjects)}">
+            <h2>Marks</h2>
+            <p class="muted">You need a subject first. <a th:href="@{/modules}">Create one under Modules</a>.</p>
+        </div>
+
+        <th:block th:unless="${#lists.isEmpty(ownedSubjects)}">
+            <div class="card">
+                <h2>Marks</h2>
+                <form th:action="@{/marks}" method="get" class="pick-form">
+                    <div class="field">
+                        <label for="subjectId">Subject</label>
+                        <select id="subjectId" name="subjectId" onchange="this.form.submit()">
+                            <option th:each="s : ${ownedSubjects}" th:value="${s.id}" th:selected="${s.id == subject.id}"
+                                    th:text="${s.code + ' - ' + s.name + ' (Sem ' + s.semester + ')'}"></option>
+                        </select>
+                    </div>
+                    <noscript><button type="submit" class="btn secondary">Load</button></noscript>
+                    <a class="btn secondary" th:href="@{/marks/export.csv(subjectId=${subject.id})}">Download CSV</a>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Assessments <span class="muted small" th:if="${totalMax > 0}" th:text="'(total ' + ${totalMax} + ' marks)'"></span></h2>
+                <p class="muted small">
+                    Each assessment's maximum marks is also its weight: the subject total is the sum of all assessments
+                    (for example Internal 1 = 25, Internal 2 = 25, Final exam = 50 gives a total out of 100).
+                </p>
+                <p class="muted" th:if="${#lists.isEmpty(assessmentList)}">No assessments yet. Add the first one below.</p>
+
+                <table th:unless="${#lists.isEmpty(assessmentList)}">
+                    <thead><tr><th>#</th><th>Name</th><th>Maximum marks</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="a : ${assessmentList}">
+                        <td th:text="${a.position}">1</td>
+                        <td th:text="${a.name}">Name</td>
+                        <td th:text="${a.maxMarks}">25</td>
+                        <td>
+                            <form th:action="@{/marks/assessments/{id}/delete(id=${a.id})}" method="post"
+                                  onsubmit="return confirm('Delete this assessment and all marks entered for it?');">
+                                <button type="submit" class="btn secondary small">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <form th:action="@{/marks/assessments}" method="post" class="pick-form add-assessment">
+                    <input type="hidden" name="subjectId" th:value="${subject.id}">
+                    <div class="field">
+                        <label for="name">New assessment</label>
+                        <input id="name" name="name" type="text" maxlength="60" required placeholder="e.g. Internal 1">
+                    </div>
+                    <div class="field">
+                        <label for="maxMarks">Maximum marks</label>
+                        <input id="maxMarks" name="maxMarks" type="number" min="1" max="200" required>
+                    </div>
+                    <button type="submit" class="btn">Add</button>
+                </form>
+            </div>
+
+            <div class="card" th:unless="${#lists.isEmpty(assessmentList)}">
+                <h2>Enter marks <span class="muted small" th:text="'· ' + ${subject.name}"></span></h2>
+                <p class="muted" th:if="${#lists.isEmpty(roster)}">
+                    No students are registered for semester <span th:text="${subject.semester}">1</span> yet.</p>
+
+                <form th:unless="${#lists.isEmpty(roster)}" th:action="@{/marks/save}" method="post">
+                    <input type="hidden" name="subjectId" th:value="${subject.id}">
+                    <div class="table-scroll">
+                        <table class="marks-grid">
+                            <thead>
+                            <tr>
+                                <th>Roll no</th><th>Name</th>
+                                <th th:each="a : ${assessmentList}">
+                                    <span th:text="${a.name}">Name</span><br>
+                                    <span class="muted small" th:text="'/ ' + ${a.maxMarks}"></span>
+                                </th>
+                                <th>Total</th><th>%</th><th>Grade</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="s : ${roster}" th:with="r=${results.get(s.id)}">
+                                <td th:text="${s.rollNo}">-</td>
+                                <td th:text="${s.fullName}">Name</td>
+                                <td th:each="a : ${assessmentList}">
+                                    <input type="number" step="0.01" min="0" th:max="${a.maxMarks}"
+                                           th:name="'m_' + ${a.id} + '_' + ${s.id}"
+                                           th:value="${grid.get(a.id + '-' + s.id) != null} ? ${grid.get(a.id + '-' + s.id).stripTrailingZeros().toPlainString()} : ''"
+                                           th:attr="aria-label=${s.fullName + ' - ' + a.name}">
+                                </td>
+                                <td><strong th:text="${r.hasMarks()} ? ${r.obtainedText()} + ' / ' + ${r.maxOfEntered()} : '-'">-</strong></td>
+                                <td th:text="${r.hasMarks()} ? ${r.percentText()} : '-'">-</td>
+                                <td>
+                                    <span th:if="${r.hasMarks()}" class="status"
+                                          th:classappend="${r.grade().pass()} ? 'done' : 'todo'"
+                                          th:text="${r.grade().letter()}">A</span>
+                                    <span th:if="${r.hasMarks() and !r.complete()}" class="muted small">provisional</span>
+                                    <span th:unless="${r.hasMarks()}">-</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>
+                        <button type="submit" class="btn">Save marks</button>
+                        <span class="muted small">Leave a box empty if the marks are not available yet. Totals, percentages and grades update after saving.</span>
+                    </p>
+                </form>
+            </div>
+        </th:block>
+    </th:block>
+
+    <!-- ================= Student ================= -->
+    <th:block th:unless="${isFaculty}">
+        <div class="card">
+            <h2>My marks</h2>
+            <p class="muted" th:if="${noSemester}">Your semester has not been set yet. Please ask the admin.</p>
+            <p class="muted" th:if="${!noSemester and #lists.isEmpty(subjectList)}">There are no subjects for your semester yet.</p>
+            <p class="muted small" th:unless="${#lists.isEmpty(subjectList)}">
+                Final grades and your SGPA are on the <a th:href="@{/results}">Results</a> page.</p>
+        </div>
+
+        <div class="card" th:each="s : ${subjectList}" th:with="r=${results.get(s.id)}, list=${assessmentsBySubject.get(s.id)}">
+            <div class="att-head">
+                <div>
+                    <span class="code" th:text="${s.code}">CODE</span>
+                    <h3 th:text="${s.name}">Subject</h3>
+                    <small class="muted" th:text="${s.faculty.fullName}">Faculty</small>
+                </div>
+                <div th:if="${r.hasMarks()}" class="att-pct">
+                    <span th:text="${r.grade().letter()}">A</span>
+                    <div class="muted small" th:text="${r.complete()} ? 'Final grade' : 'Provisional'"></div>
+                </div>
+            </div>
+
+            <p class="muted small" th:if="${list == null}">No assessments have been set up for this subject yet.</p>
+
+            <table th:if="${list != null}">
+                <thead><tr><th>Assessment</th><th>Marks</th><th>Out of</th></tr></thead>
+                <tbody>
+                <tr th:each="a : ${list}" th:with="m=${myMarks.get(a.id + '-' + meId)}">
+                    <td th:text="${a.name}">Internal 1</td>
+                    <td><strong th:if="${m != null}" th:text="${m.stripTrailingZeros().toPlainString()}">20</strong>
+                        <span th:unless="${m != null}" class="muted">Pending</span></td>
+                    <td th:text="${a.maxMarks}">25</td>
+                </tr>
+                </tbody>
+                <tfoot th:if="${r.hasMarks()}">
+                <tr>
+                    <th>Total</th>
+                    <th th:text="${r.obtainedText()}">0</th>
+                    <th th:text="${r.maxOfEntered()} + ' (' + ${r.percentText()} + '%)'">0</th>
+                </tr>
+                </tfoot>
+            </table>
+            <p class="muted small" th:if="${r.hasMarks() and !r.complete()}">
+                Provisional: only <span th:text="${r.entered()}">1</span> of <span th:text="${r.totalAssessments()}">3</span>
+                assessments have marks so far.</p>
+
+            <details th:if="${assignmentMarks.get(s.id) != null}">
+                <summary class="summary-btn small">Assignment marks (not part of the total)</summary>
+                <table>
+                    <thead><tr><th>Assignment</th><th>Marks</th></tr></thead>
+                    <tbody>
+                    <tr th:each="g : ${assignmentMarks.get(s.id)}">
+                        <td th:text="${g.assignment.title}">Assignment</td>
+                        <td th:text="${g.marks} + ' / ' + ${g.assignment.maxMarks}">0 / 10</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </details>
+        </div>
+    </th:block>
+</main>
+</body>
+</html>

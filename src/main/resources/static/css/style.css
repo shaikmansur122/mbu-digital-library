@@ -409,3 +409,11 @@ input[type="file"] { padding: 7px; background: #fff; }
 .bar span.low { background: #d6453d; }
 .warn { background: #fdecec; color: #8c1d1d; border: 1px solid #f3bcbc; border-radius: 6px; padding: 8px 12px; font-size: .88rem; margin: 8px 0; }
 .low-text { color: #b3261e; }
+
+/* ================= Phase 7: marks and results ================= */
+.table-scroll { overflow-x: auto; }
+.marks-grid input[type="number"] { width: 82px; padding: 6px 8px; }
+.marks-grid th { white-space: nowrap; }
+.marks-grid td { vertical-align: middle; white-space: nowrap; }
+.add-assessment { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); }
+tfoot th { background: #fafafb; text-transform: none; font-size: .9rem; color: var(--text); }

@@ -3,6 +3,7 @@ package edu.mbu.library.modules;
 import edu.mbu.library.assignments.AssignmentService;
 import edu.mbu.library.attendance.AttendanceService;
 import edu.mbu.library.labs.LabService;
+import edu.mbu.library.marks.MarksService;
 import edu.mbu.library.storage.FileStorageService;
 import edu.mbu.library.user.User;
 import org.springframework.stereotype.Service;
@@ -28,11 +29,13 @@ public class ModuleService {
     private final LabService labs;
     private final AssignmentService assignments;
     private final AttendanceService attendance;
+    private final MarksService marks;
 
     public ModuleService(SubjectRepository subjects, CourseModuleRepository modules,
                          MaterialRepository materials, FileStorageService storage, LabService labs,
-                         AssignmentService assignments, AttendanceService attendance) {
+                         AssignmentService assignments, AttendanceService attendance, MarksService marks) {
         this.attendance = attendance;
+        this.marks = marks;
         this.subjects = subjects;
         this.modules = modules;
         this.materials = materials;
@@ -42,7 +45,7 @@ public class ModuleService {
     }
 
     @Transactional
-    public Subject createSubject(User faculty, String code, String name, int semester) {
+    public Subject createSubject(User faculty, String code, String name, int semester, Integer credits) {
         code = code == null ? "" : code.trim();
         name = name == null ? "" : name.trim();
         if (!CODE.matcher(code).matches()) {
@@ -54,6 +57,10 @@ public class ModuleService {
         if (semester < 1 || semester > 8) {
             throw new IllegalArgumentException("Semester must be between 1 and 8.");
         }
+        int creditValue = credits == null ? 3 : credits;
+        if (creditValue < 1 || creditValue > 10) {
+            throw new IllegalArgumentException("Credits must be between 1 and 10.");
+        }
         if (subjects.existsByCodeIgnoreCase(code)) {
             throw new IllegalArgumentException("A subject with code '" + code + "' already exists.");
         }
@@ -61,6 +68,7 @@ public class ModuleService {
         s.setCode(code);
         s.setName(name);
         s.setSemester(semester);
+        s.setCredits(creditValue);
         s.setFaculty(faculty);
         return subjects.save(s);
     }
@@ -70,6 +78,7 @@ public class ModuleService {
         labs.deleteAllForSubject(subject);
         assignments.deleteAllForSubject(subject);
         attendance.deleteAllForSubject(subject);
+        marks.deleteAllForSubject(subject);
         for (CourseModule m : modules.findBySubjectOrderByPositionAscIdAsc(subject)) {
             removeModuleContents(m);
             modules.delete(m);

@@ -21,6 +21,13 @@ public class Subject {
     @Column(nullable = false)
     private int semester;
 
+    /** Credit weight used for SGPA / CGPA. Null on subjects created before credits existed (treated as 3). */
+    private Integer credits;
+
+    public int getCreditsOrDefault() { return credits == null ? 3 : credits; }
+    public Integer getCredits() { return credits; }
+    public void setCredits(Integer credits) { this.credits = credits; }
+
     /** The faculty member who teaches this subject and manages its content. */
     @ManyToOne(optional = false)
     @JoinColumn(name = "faculty_id")

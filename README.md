@@ -57,6 +57,6 @@ for real deployment run the app in a container or under a locked-down account. S
 - [x] Phase 4: lab experiments with in-browser code editor (Python, Java, C++, C, SQL)
 - [x] Phase 5: assignments (posting, file submission, grading with feedback, private downloads)
 - [x] Phase 6: attendance (faculty take it per subject and day, students see percentages, report and CSV)
-- [ ] Phase 7: marks and results
+- [x] Phase 7: marks and results (assessments, marks grid, grades, SGPA / CGPA, CSV export)
 - [ ] Phase 8: tools, resources, saved codes
 - [ ] Phase 9: polish

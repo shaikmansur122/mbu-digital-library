@@ -18,19 +18,15 @@ public class PageController {
                     "Useful tools shared by faculty."),
             "/resources", new Section("resources", "Resources", "Phase 8",
                     "Reference material uploaded by faculty."),
-            "/results", new Section("results", "Results", "Phase 7",
-                    "Internal and exam results."),
             "/codes", new Section("codes", "Codes", "Phase 8",
-                    "Your saved code from lab experiments and the editor."),
-            "/marks", new Section("marks", "Marks", "Phase 7",
-                    "Marks entered by faculty."));
+                    "Your saved code from lab experiments and the editor."));
 
     @GetMapping("/home")
     public String home() {
         return "home";
     }
 
-    @GetMapping({"/tools", "/resources", "/results", "/codes", "/marks"})
+    @GetMapping({"/tools", "/resources", "/codes"})
     public String section(HttpServletRequest request, Model model) {
         Section s = SECTIONS.get(request.getServletPath());
         model.addAttribute("active", s.key());

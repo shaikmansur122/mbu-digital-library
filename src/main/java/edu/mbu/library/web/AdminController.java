@@ -3,6 +3,7 @@ package edu.mbu.library.web;
 import edu.mbu.library.assignments.AssignmentService;
 import edu.mbu.library.attendance.AttendanceService;
 import edu.mbu.library.labs.LabService;
+import edu.mbu.library.marks.MarksService;
 import edu.mbu.library.modules.SubjectRepository;
 import edu.mbu.library.user.Role;
 import edu.mbu.library.user.User;
@@ -29,10 +30,13 @@ public class AdminController {
     private final LabService labs;
     private final AssignmentService assignments;
     private final AttendanceService attendance;
+    private final MarksService marks;
 
     public AdminController(UserRepository users, PasswordEncoder encoder, SubjectRepository subjects,
-                           LabService labs, AssignmentService assignments, AttendanceService attendance) {
+                           LabService labs, AssignmentService assignments, AttendanceService attendance,
+                           MarksService marks) {
         this.attendance = attendance;
+        this.marks = marks;
         this.users = users;
         this.encoder = encoder;
         this.subjects = subjects;
@@ -109,6 +113,7 @@ public class AdminController {
             labs.deleteSubmissionsOf(target);
             assignments.deleteSubmissionsOf(target);
             attendance.deleteAllForStudent(target);
+            marks.deleteAllForStudent(target);
             users.delete(target);
             redirect.addFlashAttribute("message", "Deleted account '" + target.getUsername() + "'");
         }

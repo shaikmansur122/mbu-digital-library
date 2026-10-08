@@ -84,10 +84,11 @@ public class ModulesController {
 
     @PostMapping("/subjects")
     public String createSubject(@RequestParam String code, @RequestParam String name, @RequestParam int semester,
+                                @RequestParam(required = false) Integer credits,
                                 Authentication auth, RedirectAttributes redirect) {
         User me = currentUser(auth);
         try {
-            Subject s = service.createSubject(me, code, name, semester);
+            Subject s = service.createSubject(me, code, name, semester, credits);
             redirect.addFlashAttribute("message", "Subject '" + s.getName() + "' created. Add its modules below.");
             return "redirect:/modules/subjects/" + s.getId();
         } catch (IllegalArgumentException e) {

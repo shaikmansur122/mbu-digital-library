@@ -6,6 +6,7 @@ import edu.mbu.library.modules.SubjectRepository;
 import edu.mbu.library.user.Role;
 import edu.mbu.library.user.User;
 import edu.mbu.library.user.UserRepository;
+import edu.mbu.library.web.CsvUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -196,12 +197,7 @@ public class AttendanceController {
         }
     }
 
-    /** CSV cell: quoted, with a leading apostrophe if a spreadsheet could read it as a formula. */
     private static String cell(String value) {
-        String v = value == null ? "" : value;
-        if (!v.isEmpty() && "=+-@\t\r".indexOf(v.charAt(0)) >= 0) {
-            v = "'" + v;
-        }
-        return "\"" + v.replace("\"", "\"\"") + "\"";
+        return CsvUtil.cell(value);
     }
 }

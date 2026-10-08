@@ -15,7 +15,7 @@
         <div>
             <span class="code" th:text="${subject.code}">CODE</span>
             <h2 th:text="${subject.name}">Subject</h2>
-            <p class="muted">Faculty:
+            <p class="muted"><span th:text="${subject.creditsOrDefault} + ' credits'">3 credits</span> &middot; Faculty:
                 <a th:href="@{/people/{id}(id=${subject.faculty.id})}" th:text="${subject.faculty.fullName}">Faculty</a>
             </p>
         </div>
