@@ -1,7 +1,19 @@
+# build output
 target/
+
+# uploaded files (photos, resumes, PDFs, student work)
 uploads/
+
+# local settings and secrets: never commit these
+config/application.properties
+config/*.local.properties
+.env
+
+# logs
 *.log
 *.err
+
+# editors and OS
 .idea/
 .vscode/
 *.iml

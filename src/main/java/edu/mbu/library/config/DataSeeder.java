@@ -5,11 +5,16 @@ import edu.mbu.library.user.User;
 import edu.mbu.library.user.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-/** Creates sample accounts on first start so the app can be tested straight away. */
+/**
+ * Creates sample accounts on first start so the app can be tried straight away.
+ * For a real deployment set app.seed-sample-accounts=false (their passwords are public) and
+ * app.initial-admin-password to create just one admin account with a password of your own.
+ */
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -17,14 +22,26 @@ public class DataSeeder implements CommandLineRunner {
 
     private final UserRepository users;
     private final PasswordEncoder encoder;
+    private final boolean seedSamples;
+    private final String initialAdminPassword;
 
-    public DataSeeder(UserRepository users, PasswordEncoder encoder) {
+    public DataSeeder(UserRepository users, PasswordEncoder encoder,
+                      @Value("${app.seed-sample-accounts:true}") boolean seedSamples,
+                      @Value("${app.initial-admin-password:}") String initialAdminPassword) {
         this.users = users;
         this.encoder = encoder;
+        this.seedSamples = seedSamples;
+        this.initialAdminPassword = initialAdminPassword;
     }
 
     @Override
     public void run(String... args) {
+        if (!seedSamples) {
+            if (!initialAdminPassword.isBlank()) {
+                seed("admin", initialAdminPassword, Role.ADMIN, "University Admin", null, null, null, null);
+            }
+            return;
+        }
         seed("admin", "Admin@123", Role.ADMIN, "University Admin", null, null, null, null);
         seed("faculty1", "Faculty@123", Role.FACULTY, "Dr. Sample Faculty", null,
                 "Data Science", null, null);
