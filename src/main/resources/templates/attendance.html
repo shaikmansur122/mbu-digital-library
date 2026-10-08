@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Attendance', 'attendance', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <!-- ================= Faculty: take attendance ================= -->
+    <th:block th:if="${isFaculty}">
+        <div class="card" th:if="${#lists.isEmpty(ownedSubjects)}">
+            <h2>Attendance</h2>
+            <p class="muted">You need a subject first. <a th:href="@{/modules}">Create one under Modules</a>.</p>
+        </div>
+
+        <th:block th:unless="${#lists.isEmpty(ownedSubjects)}">
+            <div class="card">
+                <h2>Take attendance</h2>
+                <form th:action="@{/attendance}" method="get" class="pick-form">
+                    <div class="field">
+                        <label for="subjectId">Subject</label>
+                        <select id="subjectId" name="subjectId">
+                            <option th:each="s : ${ownedSubjects}" th:value="${s.id}" th:selected="${s.id == subject.id}"
+                                    th:text="${s.code + ' - ' + s.name + ' (Sem ' + s.semester + ')'}"></option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="date">Date</label>
+                        <input id="date" name="date" type="date" th:value="${day}" th:max="${today}" required>
+                    </div>
+                    <button type="submit" class="btn secondary">Load</button>
+                    <a class="btn secondary" th:href="@{/attendance/report(subjectId=${subject.id})}">View report</a>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2><span th:text="${subject.name}">Subject</span>
+                    <span class="muted small" th:text="'· ' + ${#temporals.format(day, 'EEEE, dd MMM yyyy')}"></span></h2>
+
+                <p class="status done" th:if="${alreadyTaken}">
+                    Attendance was already taken for this day. Saving will correct it.</p>
+                <p class="muted" th:if="${#lists.isEmpty(roster)}">
+                    No students are registered for semester <span th:text="${subject.semester}">1</span> yet.</p>
+
+                <form th:unless="${#lists.isEmpty(roster)}" th:action="@{/attendance/mark}" method="post" id="markForm">
+                    <input type="hidden" name="subjectId" th:value="${subject.id}">
+                    <input type="hidden" name="date" th:value="${day}">
+
+                    <p class="quick">
+                        <button type="button" class="btn secondary small mark-all" data-status="PRESENT">Mark all present</button>
+                        <button type="button" class="btn secondary small mark-all" data-status="ABSENT">Mark all absent</button>
+                        <span class="muted small">Then change the exceptions.</span>
+                    </p>
+
+                    <table class="roll">
+                        <thead><tr><th>Roll no</th><th>Name</th><th>Present</th><th>Absent</th></tr></thead>
+                        <tbody>
+                        <tr th:each="s : ${roster}">
+                            <td th:text="${s.rollNo}">-</td>
+                            <td th:text="${s.fullName}">Name</td>
+                            <td><input type="radio" th:name="'status_' + ${s.id}" value="PRESENT" aria-label="Present"
+                                       th:checked="${existing.get(s.id) == null or existing.get(s.id).name() == 'PRESENT'}"></td>
+                            <td><input type="radio" th:name="'status_' + ${s.id}" value="ABSENT" aria-label="Absent"
+                                       th:checked="${existing.get(s.id) != null and existing.get(s.id).name() == 'ABSENT'}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn" th:text="${alreadyTaken} ? 'Save corrections' : 'Save attendance'">Save</button>
+                </form>
+            </div>
+
+            <div class="card" th:unless="${#lists.isEmpty(recentDays)}">
+                <h2>Recent days for this subject</h2>
+                <p class="chips">
+                    <a th:each="d : ${recentDays}" class="chip"
+                       th:href="@{/attendance(subjectId=${subject.id}, date=${d})}"
+                       th:text="${#temporals.format(d, 'dd MMM yyyy')}">date</a>
+                </p>
+            </div>
+        </th:block>
+    </th:block>
+
+    <!-- ================= Student: my attendance ================= -->
+    <th:block th:unless="${isFaculty}">
+        <div class="card">
+            <h2>My attendance</h2>
+            <p class="muted" th:if="${noSemester}">Your semester has not been set yet. Please ask the admin.</p>
+            <p class="muted" th:if="${!noSemester and #lists.isEmpty(subjectList)}">There are no subjects for your semester yet.</p>
+
+            <div th:if="${overall.total() > 0}" class="overall">
+                <div class="big" th:classappend="${overall.percent() < threshold} ? 'low'" th:text="${overall.percentText()} + '%'">0%</div>
+                <div>
+                    <strong>Overall</strong><br>
+                    <span class="muted small"
+                          th:text="${overall.present()} + ' present out of ' + ${overall.total()} + ' classes'"></span>
+                </div>
+            </div>
+            <p class="muted" th:if="${!noSemester and !#lists.isEmpty(subjectList) and overall.total() == 0}">
+                No attendance has been recorded for you yet.</p>
+        </div>
+
+        <div class="card att-card" th:each="s : ${subjectList}"
+             th:with="sum=${summaries.getOrDefault(s.id, emptySummary)}">
+            <div class="att-head">
+                <div>
+                    <span class="code" th:text="${s.code}">CODE</span>
+                    <h3 th:text="${s.name}">Subject</h3>
+                    <small class="muted" th:text="${s.faculty.fullName}">Faculty</small>
+                </div>
+                <div class="att-pct" th:if="${sum.total() > 0}" th:classappend="${sum.percent() < threshold} ? 'low'"
+                     th:text="${sum.percentText()} + '%'">0%</div>
+                <div class="att-pct none" th:unless="${sum.total() > 0}">&ndash;</div>
+            </div>
+
+            <div class="bar" th:if="${sum.total() > 0}">
+                <span th:classappend="${sum.percent() < threshold} ? 'low'" th:style="'width:' + ${sum.barWidth()} + '%'"></span>
+            </div>
+            <p class="muted small" th:if="${sum.total() > 0}"
+               th:text="${sum.present()} + ' present, ' + ${sum.absent()} + ' absent, ' + ${sum.total()} + ' classes'"></p>
+            <p class="muted small" th:unless="${sum.total() > 0}">No classes recorded yet.</p>
+
+            <p class="warn" th:if="${sum.total() > 0 and sum.percent() < threshold}"
+               th:text="'Below ' + ${threshold} + '%. You need to attend more classes to meet the requirement.'"></p>
+
+            <details th:if="${recordsBySubject.get(s.id) != null}">
+                <summary class="summary-btn small">Day-by-day</summary>
+                <table>
+                    <thead><tr><th>Date</th><th>Status</th></tr></thead>
+                    <tbody>
+                    <tr th:each="r : ${recordsBySubject.get(s.id)}">
+                        <td th:text="${#temporals.format(r.classDate, 'EEE, dd MMM yyyy')}">date</td>
+                        <td><span class="status" th:classappend="${r.status.name() == 'PRESENT'} ? 'done' : 'todo'"
+                                  th:text="${r.status.name() == 'PRESENT'} ? 'Present' : 'Absent'">Present</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </details>
+        </div>
+    </th:block>
+
+    <script th:src="@{/js/attendance.js}"></script>
+</main>
+</body>
+</html>

@@ -1,6 +1,7 @@
 package edu.mbu.library.modules;
 
 import edu.mbu.library.assignments.AssignmentService;
+import edu.mbu.library.attendance.AttendanceService;
 import edu.mbu.library.labs.LabService;
 import edu.mbu.library.storage.FileStorageService;
 import edu.mbu.library.user.User;
@@ -26,10 +27,12 @@ public class ModuleService {
     private final FileStorageService storage;
     private final LabService labs;
     private final AssignmentService assignments;
+    private final AttendanceService attendance;
 
     public ModuleService(SubjectRepository subjects, CourseModuleRepository modules,
                          MaterialRepository materials, FileStorageService storage, LabService labs,
-                         AssignmentService assignments) {
+                         AssignmentService assignments, AttendanceService attendance) {
+        this.attendance = attendance;
         this.subjects = subjects;
         this.modules = modules;
         this.materials = materials;
@@ -66,6 +69,7 @@ public class ModuleService {
     public void deleteSubject(Subject subject) {
         labs.deleteAllForSubject(subject);
         assignments.deleteAllForSubject(subject);
+        attendance.deleteAllForSubject(subject);
         for (CourseModule m : modules.findBySubjectOrderByPositionAscIdAsc(subject)) {
             removeModuleContents(m);
             modules.delete(m);

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Attendance report', 'attendance', ~{::main})}">
+<body>
+<main class="main">
+    <p class="crumbs"><a th:href="@{/attendance(subjectId=${subject.id})}">&larr; Take attendance</a></p>
+
+    <div class="card">
+        <span class="code" th:text="${subject.code}">CODE</span>
+        <h2 class="lab-title" th:text="${subject.name}">Subject</h2>
+        <p class="muted small">
+            Semester <span th:text="${subject.semester}">1</span> &middot;
+            attendance taken on <strong th:text="${classDays}">0</strong> day(s) &middot;
+            warning below <span th:text="${threshold}">75</span>%
+        </p>
+        <p><a class="btn secondary small" th:href="@{/attendance/report.csv(subjectId=${subject.id})}">Download CSV</a></p>
+    </div>
+
+    <div class="card">
+        <h2>Students</h2>
+        <p class="muted" th:if="${#lists.isEmpty(roster)}">No students are registered for this semester yet.</p>
+
+        <table th:unless="${#lists.isEmpty(roster)}">
+            <thead>
+            <tr><th>Roll no</th><th>Name</th><th>Present</th><th>Absent</th><th>Total</th><th>Attendance</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${roster}" th:with="sum=${summaries.getOrDefault(s.id, emptySummary)}">
+                <td th:text="${s.rollNo}">-</td>
+                <td th:text="${s.fullName}">Name</td>
+                <td th:text="${sum.present()}">0</td>
+                <td th:text="${sum.absent()}">0</td>
+                <td th:text="${sum.total()}">0</td>
+                <td>
+                    <span th:if="${sum.total() == 0}" class="muted">-</span>
+                    <th:block th:if="${sum.total() > 0}">
+                        <strong th:classappend="${sum.percent() < threshold} ? 'low-text'" th:text="${sum.percentText()} + '%'">0%</strong>
+                        <span class="status todo" th:if="${sum.percent() < threshold}">Low</span>
+                    </th:block>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

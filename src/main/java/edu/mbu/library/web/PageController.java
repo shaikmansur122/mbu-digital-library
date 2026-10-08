@@ -22,8 +22,6 @@ public class PageController {
                     "Internal and exam results."),
             "/codes", new Section("codes", "Codes", "Phase 8",
                     "Your saved code from lab experiments and the editor."),
-            "/attendance", new Section("attendance", "Attendance", "Phase 6",
-                    "Subject-wise attendance."),
             "/marks", new Section("marks", "Marks", "Phase 7",
                     "Marks entered by faculty."));
 
@@ -32,7 +30,7 @@ public class PageController {
         return "home";
     }
 
-    @GetMapping({"/tools", "/resources", "/results", "/codes", "/attendance", "/marks"})
+    @GetMapping({"/tools", "/resources", "/results", "/codes", "/marks"})
     public String section(HttpServletRequest request, Model model) {
         Section s = SECTIONS.get(request.getServletPath());
         model.addAttribute("active", s.key());

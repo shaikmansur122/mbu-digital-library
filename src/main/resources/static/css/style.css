@@ -384,3 +384,28 @@ p.status { border-radius: 6px; padding: 8px 12px; font-size: .88rem; font-weight
 .grade-form input[type="number"] { width: 70px; }
 .grade-form input[type="text"] { flex: 1 1 160px; min-width: 130px; }
 input[type="file"] { padding: 7px; background: #fff; }
+
+/* ================= Phase 6: attendance ================= */
+.pick-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.pick-form .field { margin: 0; min-width: 190px; }
+.pick-form .btn { align-self: flex-end; }
+.quick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
+.roll td:nth-child(n+3), .roll th:nth-child(n+3) { text-align: center; width: 90px; }
+.roll input[type="radio"] { width: 18px; height: 18px; accent-color: var(--mbu-red); }
+.roll tbody tr:hover { background: #fafafb; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.chip { padding: 5px 12px; border: 1px solid var(--border); border-radius: 999px; font-size: .85rem; text-decoration: none; background: #fff; }
+.chip:hover { border-color: var(--mbu-red); }
+
+.overall { display: flex; align-items: center; gap: 18px; }
+.overall .big { font-size: 2.2rem; font-weight: 700; color: #17653a; }
+.overall .big.low, .att-pct.low { color: #b3261e; }
+.att-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.att-head h3 { margin: 6px 0 2px; font-size: 1.1rem; }
+.att-pct { font-size: 1.8rem; font-weight: 700; color: #17653a; }
+.att-pct.none { color: var(--muted); }
+.bar { height: 10px; background: #eceef2; border-radius: 999px; overflow: hidden; margin: 10px 0 6px; }
+.bar span { display: block; height: 100%; background: #2e9e5b; border-radius: 999px; }
+.bar span.low { background: #d6453d; }
+.warn { background: #fdecec; color: #8c1d1d; border: 1px solid #f3bcbc; border-radius: 6px; padding: 8px 12px; font-size: .88rem; margin: 8px 0; }
+.low-text { color: #b3261e; }

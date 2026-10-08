@@ -56,7 +56,7 @@ for real deployment run the app in a container or under a locked-down account. S
 - [x] Phase 3: modules (semester, subjects, modules, PDFs and YouTube links posted by the subject's faculty)
 - [x] Phase 4: lab experiments with in-browser code editor (Python, Java, C++, C, SQL)
 - [x] Phase 5: assignments (posting, file submission, grading with feedback, private downloads)
-- [ ] Phase 6: attendance
+- [x] Phase 6: attendance (faculty take it per subject and day, students see percentages, report and CSV)
 - [ ] Phase 7: marks and results
 - [ ] Phase 8: tools, resources, saved codes
 - [ ] Phase 9: polish
