@@ -13,9 +13,25 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
-  background: var(--bg);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
   color: var(--text);
+  /* Campus photo on every page, softened with a light overlay so text stays readable */
+  background-color: var(--bg);
+  background-image: linear-gradient(rgba(245, 246, 248, .62), rgba(245, 246, 248, .62)),
+                    url("../images/campus-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Headings, nav and page titles use Poppins */
+h1, h2, h3, .topnav a, .att-pct, .overall .big, .lab-title {
+  font-family: "Poppins", "Inter", "Segoe UI", system-ui, sans-serif;
+}
+button, input, select, textarea { font-family: inherit; }
+
+@media (max-width: 760px) {
+  body { background-attachment: scroll; }   /* fixed backgrounds are unreliable on phones */
 }
 
 /* ---------- Top bar (logo on the right) ---------- */
@@ -430,3 +446,24 @@ form.inline { display: inline; }
 .save-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 4px; }
 .save-row input[type="text"] { flex: 1 1 260px; max-width: 420px; }
 .delete-row { margin-top: 18px; padding-top: 12px; border-top: 1px dashed var(--border); }
+
+/* ================= Faculty card: logo buttons ================= */
+.social { display: flex; gap: 12px; margin: 12px 0 2px; }
+.social-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: #444;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.social-btn svg { width: 22px; height: 22px; fill: currentColor; }
+a.social-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0, 0, 0, .25); }
+a.social-btn:focus-visible { outline: 3px solid var(--mbu-gold); outline-offset: 2px; }
+.social-btn.github { background: #24292f; }
+.social-btn.linkedin { background: #0a66c2; }
+.social-btn.resume { background: var(--mbu-red); }
+.social-btn.disabled { background: #d7dae0; color: #9aa0ab; cursor: not-allowed; }
