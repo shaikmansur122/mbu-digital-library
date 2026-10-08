@@ -1,5 +1,6 @@
 package edu.mbu.library.web;
 
+import edu.mbu.library.labs.LabService;
 import edu.mbu.library.modules.SubjectRepository;
 import edu.mbu.library.user.Role;
 import edu.mbu.library.user.User;
@@ -23,11 +24,13 @@ public class AdminController {
     private final UserRepository users;
     private final PasswordEncoder encoder;
     private final SubjectRepository subjects;
+    private final LabService labs;
 
-    public AdminController(UserRepository users, PasswordEncoder encoder, SubjectRepository subjects) {
+    public AdminController(UserRepository users, PasswordEncoder encoder, SubjectRepository subjects, LabService labs) {
         this.users = users;
         this.encoder = encoder;
         this.subjects = subjects;
+        this.labs = labs;
     }
 
     @GetMapping("/admin/dashboard")
@@ -96,6 +99,7 @@ public class AdminController {
                     + "' still teaches subjects. Delete those subjects first.");
         } else {
             users.clearMentor(target);
+            labs.deleteSubmissionsOf(target);
             users.delete(target);
             redirect.addFlashAttribute("message", "Deleted account '" + target.getUsername() + "'");
         }

@@ -14,8 +14,6 @@ public class PageController {
     private record Section(String key, String title, String phase, String description) {}
 
     private static final Map<String, Section> SECTIONS = Map.of(
-            "/labs", new Section("labs", "Lab Experiments", "Phase 4",
-                    "Lab experiments assigned by faculty, solved and submitted in the built-in code editor."),
             "/tools", new Section("tools", "Tools", "Phase 8",
                     "Useful tools shared by faculty."),
             "/resources", new Section("resources", "Resources", "Phase 8",
@@ -24,8 +22,6 @@ public class PageController {
                     "Internal and exam results."),
             "/codes", new Section("codes", "Codes", "Phase 8",
                     "Your saved code from lab experiments and the editor."),
-            "/editor", new Section("editor", "Editor", "Phase 4",
-                    "Practice code editor for Python, Java, C++, C and SQL."),
             "/attendance", new Section("attendance", "Attendance", "Phase 6",
                     "Subject-wise attendance."),
             "/marks", new Section("marks", "Marks", "Phase 7",
@@ -38,8 +34,7 @@ public class PageController {
         return "home";
     }
 
-    @GetMapping({"/labs", "/tools", "/resources", "/results", "/codes", "/editor",
-            "/attendance", "/marks", "/assignments"})
+    @GetMapping({"/tools", "/resources", "/results", "/codes", "/attendance", "/marks", "/assignments"})
     public String section(HttpServletRequest request, Model model) {
         Section s = SECTIONS.get(request.getServletPath());
         model.addAttribute("active", s.key());

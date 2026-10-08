@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Code editor component. Parameters:
+    language   - PYTHON | JAVA | CPP | C | SQL (initial language)
+    code       - initial code
+    selectable - true to let the user switch language (practice editor)
+    readOnly   - true for viewing a submission
+    fieldName  - name of the textarea, so the editor can sit inside a form
+  Behaviour lives in /js/code-editor.js
+-->
+<div th:fragment="editor(language, code, selectable, readOnly, fieldName)" class="code-editor"
+     th:attr="data-language=${language}, data-readonly=${readOnly}, data-run-url=@{/labs/run}, data-csrf=${_csrf.token}">
+
+    <div class="editor-toolbar">
+        <label th:if="${selectable}" class="lang-pick">Language
+            <select class="lang-select">
+                <option value="PYTHON" th:selected="${language == 'PYTHON'}">Python</option>
+                <option value="JAVA" th:selected="${language == 'JAVA'}">Java</option>
+                <option value="CPP" th:selected="${language == 'CPP'}">C++</option>
+                <option value="C" th:selected="${language == 'C'}">C</option>
+                <option value="SQL" th:selected="${language == 'SQL'}">SQL</option>
+            </select>
+        </label>
+        <button type="button" class="btn small run-btn">&#9654; Run</button>
+        <span class="run-status small muted"></span>
+    </div>
+
+    <textarea class="code-source" th:name="${fieldName}" spellcheck="false" rows="16" th:text="${code}"></textarea>
+    <div class="editor-surface" hidden></div>
+
+    <div class="editor-io">
+        <div>
+            <label>Input for the program (stdin)</label>
+            <textarea class="stdin" rows="4" spellcheck="false" placeholder="Optional. One value per line."></textarea>
+        </div>
+        <div>
+            <label>Output</label>
+            <pre class="output">Click Run to see the output here.</pre>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

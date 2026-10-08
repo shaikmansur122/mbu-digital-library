@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Editor', 'editor', ~{::main})}">
+<body>
+<main class="main">
+    <div class="card">
+        <h2>Practice editor</h2>
+        <p class="muted small">
+            Try out code in Python, Java, C++, C or SQL. Nothing here is saved or submitted:
+            graded work is done from <a th:href="@{/labs}">Lab Experiments</a>.
+        </p>
+        <div th:replace="~{fragments/editor :: editor('PYTHON', '', true, false, 'code')}"></div>
+    </div>
+    <script th:src="@{/js/code-editor.js}"></script>
+</main>
+</body>
+</html>

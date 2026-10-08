@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Lab Experiments', 'labs', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <!-- ================= Faculty ================= -->
+    <th:block th:if="${isFaculty}">
+        <div class="card">
+            <h2>Lab experiments you assigned</h2>
+            <p class="muted" th:if="${#lists.isEmpty(experimentList)}">You have not assigned any lab experiment yet.</p>
+
+            <table th:unless="${#lists.isEmpty(experimentList)}">
+                <thead>
+                <tr><th>Experiment</th><th>Subject</th><th>Language</th><th>Due</th><th>Submitted</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${experimentList}">
+                    <td><a th:href="@{/labs/{id}(id=${e.id})}" th:text="${e.title}">Title</a></td>
+                    <td><span th:text="${e.subject.name}">Subject</span>
+                        <span class="muted small" th:text="'(Sem ' + ${e.subject.semester} + ')'"></span></td>
+                    <td th:text="${e.language.label}">Python</td>
+                    <td th:text="${e.dueDate != null} ? ${#temporals.format(e.dueDate, 'dd MMM yyyy, HH:mm')} : '-'">-</td>
+                    <td><strong th:text="${submittedCounts.get(e.id)}">0</strong>
+                        <span class="muted" th:text="'/ ' + ${classSizes.get(e.id)}">/ 0</span></td>
+                    <td>
+                        <form th:action="@{/labs/{id}/delete(id=${e.id})}" method="post"
+                              onsubmit="return confirm('Delete this experiment and all submissions?');">
+                            <button type="submit" class="btn secondary small">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <details th:attr="open=${error != null or #lists.isEmpty(experimentList)} ? 'open'">
+                <summary class="summary-btn">+ Assign a lab experiment</summary>
+
+                <p class="muted" th:if="${#lists.isEmpty(ownedSubjects)}">
+                    You need a subject first. <a th:href="@{/modules}">Create one under Modules</a>.
+                </p>
+
+                <form th:unless="${#lists.isEmpty(ownedSubjects)}" th:action="@{/labs}" method="post" class="stack">
+                    <div class="grid">
+                        <div class="field">
+                            <label for="subjectId">Subject</label>
+                            <select id="subjectId" name="subjectId" required>
+                                <option th:each="s : ${ownedSubjects}" th:value="${s.id}"
+                                        th:text="${s.code + ' - ' + s.name + ' (Sem ' + s.semester + ')'}"></option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="title">Title</label>
+                            <input id="title" name="title" type="text" maxlength="150" required
+                                   placeholder="e.g. Experiment 1: Linear Regression">
+                        </div>
+                        <div class="field">
+                            <label for="language">Language</label>
+                            <select id="language" name="language" required>
+                                <option th:each="l : ${languages}" th:value="${l}" th:text="${l.label}"></option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="dueDate">Due date (optional)</label>
+                            <input id="dueDate" name="dueDate" type="datetime-local">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="description">Problem statement / instructions</label>
+                        <textarea id="description" name="description" rows="5" maxlength="4000"
+                                  placeholder="Describe what the student must do."></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="starterCode">Starter code (optional)</label>
+                        <textarea id="starterCode" name="starterCode" rows="6" spellcheck="false" class="mono"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Assign experiment</button>
+                    <p class="muted small">It will be visible to all students of the subject's semester.</p>
+                </form>
+            </details>
+        </div>
+    </th:block>
+
+    <!-- ================= Student ================= -->
+    <th:block th:unless="${isFaculty}">
+        <div class="card">
+            <h2>Lab experiments</h2>
+            <p class="muted" th:if="${noSemester}">Your semester has not been set yet, so no experiments can be shown. Please ask the admin.</p>
+            <p class="muted" th:if="${!noSemester and #lists.isEmpty(experimentList)}">
+                No lab experiments have been assigned for your semester yet.</p>
+
+            <div class="labs" th:unless="${#lists.isEmpty(experimentList)}">
+                <a class="lab-card" th:each="e : ${experimentList}" th:href="@{/labs/{id}(id=${e.id})}">
+                    <div class="lab-top">
+                        <strong th:text="${e.title}">Title</strong>
+                        <span class="badge light" th:text="${e.language.label}">Python</span>
+                    </div>
+                    <small class="muted" th:text="${e.subject.name}">Subject</small>
+                    <small th:if="${e.dueDate != null}" th:text="'Due ' + ${#temporals.format(e.dueDate, 'dd MMM yyyy, HH:mm')}">Due</small>
+                    <span class="status done" th:if="${mySubmissions.containsKey(e.id)}"
+                          th:text="${mySubmissions.get(e.id).late} ? 'Submitted (late)' : 'Submitted'">Submitted</span>
+                    <span class="status todo" th:unless="${mySubmissions.containsKey(e.id)}">Not submitted</span>
+                </a>
+            </div>
+        </div>
+    </th:block>
+</main>
+</body>
+</html>

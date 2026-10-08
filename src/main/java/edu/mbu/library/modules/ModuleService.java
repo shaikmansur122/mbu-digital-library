@@ -1,5 +1,6 @@
 package edu.mbu.library.modules;
 
+import edu.mbu.library.labs.LabService;
 import edu.mbu.library.storage.FileStorageService;
 import edu.mbu.library.user.User;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,15 @@ public class ModuleService {
     private final CourseModuleRepository modules;
     private final MaterialRepository materials;
     private final FileStorageService storage;
+    private final LabService labs;
 
     public ModuleService(SubjectRepository subjects, CourseModuleRepository modules,
-                         MaterialRepository materials, FileStorageService storage) {
+                         MaterialRepository materials, FileStorageService storage, LabService labs) {
         this.subjects = subjects;
         this.modules = modules;
         this.materials = materials;
         this.storage = storage;
+        this.labs = labs;
     }
 
     @Transactional
@@ -57,6 +60,7 @@ public class ModuleService {
 
     @Transactional
     public void deleteSubject(Subject subject) {
+        labs.deleteAllForSubject(subject);
         for (CourseModule m : modules.findBySubjectOrderByPositionAscIdAsc(subject)) {
             removeModuleContents(m);
             modules.delete(m);

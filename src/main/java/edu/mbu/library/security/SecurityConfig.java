@@ -24,8 +24,12 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // Only faculty may change module content (the controller also checks they own the subject).
                 .requestMatchers(HttpMethod.POST, "/modules/**").hasRole("FACULTY")
+                // Labs: faculty assign and delete, students submit, both can run code in the editor.
+                .requestMatchers(HttpMethod.POST, "/labs/run").hasAnyRole("STUDENT", "FACULTY")
+                .requestMatchers(HttpMethod.POST, "/labs/*/submit").hasRole("STUDENT")
+                .requestMatchers(HttpMethod.POST, "/labs/**").hasRole("FACULTY")
                 // Students and faculty share the same interface; what they can do inside is decided per page.
-                .requestMatchers("/home", "/modules/**", "/labs", "/tools", "/resources", "/results", "/codes",
+                .requestMatchers("/home", "/modules/**", "/labs/**", "/tools", "/resources", "/results", "/codes",
                         "/editor", "/attendance", "/marks", "/assignments", "/profile", "/people/**", "/files/**")
                     .hasAnyRole("STUDENT", "FACULTY")
                 .requestMatchers("/").authenticated()

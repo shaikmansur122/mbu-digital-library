@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell('Submission', 'labs', ~{::main})}">
+<body>
+<main class="main">
+    <p class="crumbs"><a th:href="@{/labs/{id}(id=${experiment.id})}">&larr; Back to submissions</a></p>
+
+    <div class="card">
+        <span class="code" th:text="${experiment.subject.code}">CODE</span>
+        <h2 class="lab-title" th:text="${experiment.title}">Title</h2>
+        <p class="muted small">
+            Submitted by <strong th:text="${submission.student.fullName}">Student</strong>
+            (<span th:text="${submission.student.rollNo}">Roll no</span>)
+            on <span th:text="${#temporals.format(submission.submittedAt, 'dd MMM yyyy, HH:mm')}">date</span>
+            <span th:if="${submission.late}" class="status todo">late</span>
+            &middot; attempt <span th:text="${submission.attempts}">1</span>
+            &middot; <span class="badge light" th:text="${experiment.language.label}">Python</span>
+        </p>
+
+        <!-- Read-only: faculty can run the student's code to check it -->
+        <div th:replace="~{fragments/editor :: editor(${experiment.language.name()}, ${submission.code}, false, true, 'code')}"></div>
+    </div>
+
+    <script th:src="@{/js/code-editor.js}"></script>
+</main>
+</body>
+</html>

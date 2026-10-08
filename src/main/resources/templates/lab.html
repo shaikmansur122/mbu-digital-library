@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/shell :: shell(${experiment.title}, 'labs', ~{::main})}">
+<body>
+<main class="main">
+    <div class="alert ok" th:if="${message}" th:text="${message}"></div>
+    <div class="alert err" th:if="${error}" th:text="${error}"></div>
+
+    <p class="crumbs"><a th:href="@{/labs}">&larr; Lab Experiments</a></p>
+
+    <div class="card">
+        <span class="code" th:text="${experiment.subject.code}">CODE</span>
+        <h2 class="lab-title" th:text="${experiment.title}">Title</h2>
+        <p class="muted small">
+            <span th:text="${experiment.subject.name}">Subject</span> &middot;
+            <span class="badge light" th:text="${experiment.language.label}">Python</span>
+            <span th:if="${experiment.dueDate != null}">&middot; Due
+                <strong th:text="${#temporals.format(experiment.dueDate, 'dd MMM yyyy, HH:mm')}">date</strong></span>
+        </p>
+        <div class="statement" th:if="${experiment.description != null}" th:text="${experiment.description}">Statement</div>
+        <p class="muted" th:unless="${experiment.description != null}">No instructions were given for this experiment.</p>
+    </div>
+
+    <!-- ================= Student: solve and submit ================= -->
+    <th:block th:unless="${isFaculty}">
+        <div class="card">
+            <h2>Your solution</h2>
+            <p class="status done" th:if="${submission != null}">
+                Submitted on <span th:text="${#temporals.format(submission.submittedAt, 'dd MMM yyyy, HH:mm')}">date</span>
+                <span th:if="${submission.late}">(after the due date)</span>
+                &middot; attempt <span th:text="${submission.attempts}">1</span>.
+                You can change the code and submit again.
+            </p>
+            <p class="status todo" th:if="${submission == null}">Not submitted yet.</p>
+
+            <form th:action="@{/labs/{id}/submit(id=${experiment.id})}" method="post">
+                <div th:replace="~{fragments/editor :: editor(${experiment.language.name()}, ${initialCode}, false, false, 'code')}"></div>
+                <button type="submit" class="btn submit-btn"
+                        onclick="return confirm('Submit this code for grading?');">Submit solution</button>
+                <span class="muted small">Run your code first to check it, then submit.</span>
+            </form>
+        </div>
+    </th:block>
+
+    <!-- ================= Faculty: who has submitted ================= -->
+    <th:block th:if="${isFaculty}">
+        <div class="card">
+            <h2>Submissions
+                <span class="muted small" th:text="'(' + ${submittedCount} + ' of ' + ${#lists.size(roster)} + ' students)'"></span>
+            </h2>
+            <p class="muted" th:if="${#lists.isEmpty(roster)}">
+                No students are registered for semester <span th:text="${experiment.subject.semester}">1</span> yet.</p>
+
+            <table th:unless="${#lists.isEmpty(roster)}">
+                <thead>
+                <tr><th>Roll no</th><th>Name</th><th>Status</th><th>Submitted</th><th>Attempts</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${roster}">
+                    <td th:text="${s.rollNo}">-</td>
+                    <td th:text="${s.fullName}">Name</td>
+                    <td>
+                        <span class="status done" th:if="${submissionByStudent.containsKey(s.id)}"
+                              th:text="${submissionByStudent.get(s.id).late} ? 'Submitted (late)' : 'Submitted'">Submitted</span>
+                        <span class="status todo" th:unless="${submissionByStudent.containsKey(s.id)}">Not submitted</span>
+                    </td>
+                    <td th:text="${submissionByStudent.containsKey(s.id)} ? ${#temporals.format(submissionByStudent.get(s.id).submittedAt, 'dd MMM yyyy, HH:mm')} : '-'">-</td>
+                    <td th:text="${submissionByStudent.containsKey(s.id)} ? ${submissionByStudent.get(s.id).attempts} : '-'">-</td>
+                    <td>
+                        <a th:if="${submissionByStudent.containsKey(s.id)}"
+                           th:href="@{/labs/{id}/submissions/{sid}(id=${experiment.id}, sid=${submissionByStudent.get(s.id).id})}">View code</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+
+    <script th:src="@{/js/code-editor.js}"></script>
+</main>
+</body>
+</html>

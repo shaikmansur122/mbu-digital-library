@@ -18,6 +18,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByRoleOrderByFullNameAsc(Role role);
 
+    /** The class roster for a semester, used to show who has and has not submitted a lab. */
+    List<User> findAllByRoleAndSemesterOrderByRollNoAscFullNameAsc(Role role, Integer semester);
+
+    long countByRoleAndSemester(Role role, Integer semester);
+
     /** Used before deleting a faculty account so students are not left pointing at it. */
     @Modifying
     @Query("update User u set u.mentor = null where u.mentor = :mentor")
