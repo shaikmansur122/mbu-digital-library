@@ -27,7 +27,14 @@
                 <button type="submit" class="btn">Log in</button>
             </form>
 
-            <p class="hint">Don't have an account? Accounts are created by the university admin.</p>
+            <!-- Shown only when app.show-demo-logins=true (public demo sites) -->
+            <div class="hint demo" th:if="${showDemoLogins}">
+                <strong>Demo logins</strong><br>
+                Admin: <code>admin</code> / <code>Admin@123</code><br>
+                Faculty: <code>faculty1</code> / <code>Faculty@123</code><br>
+                Student: <code>student1</code> / <code>Student@123</code>
+            </div>
+            <p class="hint" th:unless="${showDemoLogins}">Don't have an account? Accounts are created by the university admin.</p>
         </div>
     </main>
 </div>

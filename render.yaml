@@ -1,0 +1,22 @@
+# Render "Blueprint": describes the web service so it can be created in one click.
+# Secrets (marked sync: false) are typed into the Render dashboard, never stored in git.
+services:
+  - type: web
+    name: mbu-digital-library
+    runtime: docker
+    plan: free
+    healthCheckPath: /login
+    envVars:
+      # Connection details of the MySQL database (see DEPLOY.md)
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      # Public-site safety: no running of student Java/C/C++ programs on the server
+      - key: APP_CODE_RUNNER_ENABLED
+        value: "false"
+      # Demo: show the sample logins on the sign-in page
+      - key: APP_SHOW_DEMO_LOGINS
+        value: "true"

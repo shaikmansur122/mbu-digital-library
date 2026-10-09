@@ -83,6 +83,12 @@ On first start the app creates three accounts so you can try it straight away:
 > `app.seed-sample-accounts=false` and `app.initial-admin-password=<your password>` in
 > `config/application.properties`, then create the real accounts from the admin dashboard.
 
+## Putting it online
+
+For a free live demo (Render + Aiven MySQL) follow [`DEPLOY.md`](DEPLOY.md). The repository includes a `Dockerfile` and a
+`render.yaml` blueprint. Free hosting is for demos only: files are erased when the site sleeps and server-side
+Java/C/C++ running is switched off.
+
 ## Configuration
 
 Settings go in `config/application.properties` (see [`config/application.example.properties`](config/application.example.properties)).
@@ -97,6 +103,8 @@ Defaults live in `src/main/resources/application.properties`.
 | `app.seed-sample-accounts` | `true` | Create the sample accounts on first start |
 | `app.initial-admin-password` | (empty) | Creates an `admin` account with this password when sample accounts are off |
 | `app.code-runner.enabled` | `true` | Allow running Java, C and C++ programs on the server |
+| `app.show-demo-logins` | `false` | Show the sample logins on the sign-in page (public demos only) |
+| `PORT`, `COOKIE_SECURE`, `THYMELEAF_CACHE` | `8080`, `false`, `false` | Environment variables for hosting (set by the Dockerfile / host) |
 | `app.code-runner.run-timeout-seconds` | `5` | Time limit for a program run |
 | `app.code-runner.max-concurrent` | `2` | How many programs may run at the same time |
 

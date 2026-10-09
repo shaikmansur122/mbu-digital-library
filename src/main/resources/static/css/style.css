@@ -697,3 +697,7 @@ a.social-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px
   .tile::after { right: 14px; top: 14px; }
   .items, .labs, .subjects { grid-template-columns: 1fr; }
 }
+
+/* Demo logins box (public demo sites) */
+.hint code { background: rgba(176, 18, 23, .09); color: var(--red-deep); padding: 1px 7px; border-radius: 6px; font-size: .78rem; }
+.hint.demo strong { font-family: var(--font-head); color: var(--ink); }

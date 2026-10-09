@@ -18,3 +18,9 @@ config/*.local.properties
 .vscode/
 *.iml
 .DS_Store
+
+# local backups (contain real data)
+backup/
+
+# Windows shortcuts
+*.lnk

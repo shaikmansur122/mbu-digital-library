@@ -1,0 +1,12 @@
+.git
+.github
+target
+uploads
+backup
+docs
+config/application.properties
+*.log
+*.err
+*.lnk
+.idea
+.vscode
